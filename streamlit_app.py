@@ -17,7 +17,7 @@ def save_data(df, file_path):
 
 # Streamlit 应用主入口
 def main():
-    st.title("佣金计算系统")
+    st.title("Commission System")
 
     # 登录或注册界面选择
     if "logged_in" not in st.session_state:
@@ -61,21 +61,21 @@ def login():
 
 # 注册功能
 def register():
-    st.sidebar.header("注册")
-    name = st.sidebar.text_input("姓名")
-    username = st.sidebar.text_input("用户名")
-    password = st.sidebar.text_input("密码", type="password")
-    role = st.sidebar.radio("角色", ["sales", "admin"], format_func=lambda x: "销售" if x == "sales" else "管理员")
+    st.sidebar.header("Register")
+    name = st.sidebar.text_input("Name")
+    username = st.sidebar.text_input("Username")
+    password = st.sidebar.text_input("Password", type="password")
+    role = st.sidebar.radio("角色", ["sales", "admin"], format_func=lambda x: "Sales" if x == "sales" else "Admin")
 
-    if st.sidebar.button("注册"):
+    if st.sidebar.button("Register"):
         if not name or not username or not password:
-            st.sidebar.error("请填写所有字段！")
+            st.sidebar.error("Please fill out all the blank")
         elif username_exists(username):
-            st.sidebar.error("用户名已存在！")
+            st.sidebar.error("User Name already exist")
         else:
             new_user = {"username": username, "password": password, "name": name, "role": role}
             add_user(new_user)
-            st.sidebar.success("注册成功！请返回登录。")
+            st.sidebar.success("Success! Please back to log in!")
 
 # 检查用户名是否存在
 def username_exists(username):
@@ -84,7 +84,8 @@ def username_exists(username):
 # 添加新用户
 def add_user(user):
     global users_df
-    users_df = users_df.append(user, ignore_index=True)
+    new_user = pd.DataFrame([user])
+    users_df = pd.concat([users_df, new_user], ignore_index=True)
     save_data(users_df, USERS_FILE)
 
 # 用户身份验证
