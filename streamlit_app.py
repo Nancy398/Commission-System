@@ -24,18 +24,18 @@ def main():
         st.session_state.logged_in = False
 
     if not st.session_state.logged_in:
-        option = st.sidebar.selectbox("选择操作", ["登录", "注册"])
+        option = st.sidebar.selectbox("Choose", ["Log in", "Register"])
 
-        if option == "登录":
+        if option == "Log in":
             login()
-        elif option == "注册":
+        elif option == "Register":
             register()
 
         return
 
     # 已登录用户界面
-    st.sidebar.header(f"欢迎, {st.session_state.user['name']}")
-    if st.sidebar.button("退出登录"):
+    st.sidebar.header(f"Welcome, {st.session_state.user['name']}")
+    if st.sidebar.button("Sign out"):
         st.session_state.logged_in = False
         return
 
@@ -47,17 +47,17 @@ def main():
 
 # 登录功能
 def login():
-    st.sidebar.header("登录")
-    username = st.sidebar.text_input("用户名")
-    password = st.sidebar.text_input("密码", type="password")
-    if st.sidebar.button("登录"):
+    st.sidebar.header("Log in")
+    username = st.sidebar.text_input("User")
+    password = st.sidebar.text_input("Password", type="password")
+    if st.sidebar.button("Log in "):
         user = authenticate(username, password)
         if user:
             st.session_state.logged_in = True
             st.session_state.user = user
-            st.success(f"欢迎 {user['name']}！")
+            st.success(f"Welcome {user['name']}！")
         else:
-            st.sidebar.error("用户名或密码错误！")
+            st.sidebar.error("User Name or Password wrong！")
 
 # 注册功能
 def register():
