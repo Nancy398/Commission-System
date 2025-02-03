@@ -10,6 +10,10 @@ from datetime import datetime
 from datetime import datetime, timedelta
 import time
 
+# 保存数据
+def save_data(df, file_path):
+    df.to_csv(file_path, index=False)
+  
 # @st.cache_data(ttl=300)
 def read_file(name,sheet):
   scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -23,11 +27,11 @@ def read_file(name,sheet):
   df = pd.DataFrame(df.values[1:], columns=df.iloc[0])
   return df
 df = read_file("Leasing Database","Sheet2")
-df.to_csv("data/deals.csv", index=False)
+save_data(df,DEALS_FILE)
 
 # 数据文件路径
 USERS_FILE = "users.csv"
-# DEALS_FILE = "data/deals.csv"
+DEALS_FILE = "deals.csv"
 # FEEDBACKS_FILE = "data/feedbacks.csv"
 
 # 读取数据
