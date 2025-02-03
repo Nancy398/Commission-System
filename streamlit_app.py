@@ -1,6 +1,30 @@
 import streamlit as st
 import pandas as pd
 
+from google.oauth2.service_account import Credentials
+import pandas as pd
+import gspread
+import os
+from gspread_dataframe import set_with_dataframe
+from datetime import datetime
+from datetime import datetime, timedelta
+import time
+
+@st.cache_data(ttl=300)
+def read_file(name,sheet):
+  scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+  credentials = Credentials.from_service_account_info(
+  st.secrets["GOOGLE_APPLICATION_CREDENTIALS"], 
+  scopes=scope)
+  gc = gspread.authorize(credentials)
+  worksheet = gc.open(name).worksheet(sheet)
+  rows = worksheet.get_all_values()
+  df = pd.DataFrame.from_records(rows)
+  df = pd.DataFrame(df.values[1:], columns=df.iloc[0])
+  return df
+df = read_file("Leasing Database","Sheet2")
+df.to_csv("deals.csv", index=False)
+
 # 数据文件路径
 USERS_FILE = "users.csv"
 # DEALS_FILE = "data/deals.csv"
@@ -30,7 +54,6 @@ def main():
             login()
         elif option == "Register":
             register()
-
         return
 
     # 已登录用户界面
