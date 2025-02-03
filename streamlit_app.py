@@ -23,7 +23,7 @@ def read_file(name,sheet):
   df = pd.DataFrame(df.values[1:], columns=df.iloc[0])
   return df
 df = read_file("Leasing Database","Sheet2")
-df.to_csv("deals.csv", index=False)
+df.to_csv("data/deals.csv", index=False)
 
 # 数据文件路径
 USERS_FILE = "users.csv"
