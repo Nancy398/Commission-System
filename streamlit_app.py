@@ -13,7 +13,10 @@ import time
 # 保存数据
 def save_data(df, file_path):
     df.to_csv(file_path, index=False)
-  
+    
+USERS_FILE = "users.csv"
+DEALS_FILE = "deals.csv"  
+
 # @st.cache_data(ttl=300)
 def read_file(name,sheet):
   scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
