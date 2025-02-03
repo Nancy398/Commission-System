@@ -10,7 +10,7 @@ from datetime import datetime
 from datetime import datetime, timedelta
 import time
 
-@st.cache_data(ttl=300)
+# @st.cache_data(ttl=300)
 def read_file(name,sheet):
   scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
   credentials = Credentials.from_service_account_info(
