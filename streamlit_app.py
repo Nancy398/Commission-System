@@ -10,6 +10,78 @@ from datetime import datetime
 from datetime import datetime, timedelta
 import time
 
+import streamlit as st
+
+# 用户信息，包括角色和初始密码
+USER_CREDENTIALS = {
+    "admin": {
+        "password": "initialpassword123",  # 初始密码
+        "role": "admin",  # 角色为 admin
+        "has_reset": False  # 标记密码是否已重置
+    },
+    "sales": {
+        "password": "initialpassword123",  # 初始密码
+        "role": "sales",  # 角色为 sales
+        "has_reset": False  # 标记密码是否已重置
+    }
+}
+
+# 登录函数
+def login():
+    st.title("登录系统")
+    
+    username = st.text_input("用户名")
+    password = st.text_input("密码", type="password")
+    
+    if st.button("登录"):
+        if username in USER_CREDENTIALS and password == USER_CREDENTIALS[username]["password"]:
+            if USER_CREDENTIALS[username]["has_reset"]:
+                st.success(f"欢迎，{username}！")
+                return username
+            else:
+                st.warning("这是您第一次登录，请设置您的新密码。")
+                return reset_password(username)
+        else:
+            st.error("用户名或密码错误！")
+            return None
+
+# 密码重置函数
+def reset_password(username):
+    st.subheader("设置新密码")
+    new_password = st.text_input("新密码", type="password")
+    confirm_password = st.text_input("确认密码", type="password")
+    
+    if st.button("重置密码"):
+        if new_password == confirm_password:
+            USER_CREDENTIALS[username]["password"] = new_password
+            USER_CREDENTIALS[username]["has_reset"] = True
+            st.success("密码重置成功！现在可以登录。")
+            return username
+        else:
+            st.error("密码和确认密码不一致，请重新输入。")
+            return None
+
+# 根据用户角色显示不同的功能
+def show_dashboard(username):
+    role = USER_CREDENTIALS[username]["role"]
+    
+    if role == "admin":
+        st.subheader("管理员面板")
+        st.write("这里是管理员的功能：")
+        st.write("1. 用户管理")
+        st.write("2. 权限管理")
+        st.write("3. 查看所有销售数据")
+    elif role == "sales":
+        st.subheader("销售人员面板")
+        st.write("这里是销售人员的功能：")
+        st.write("1. 查看个人销售数据")
+        st.write("2. 查看客户信息")
+
+# 调用登录函数
+username = login()
+if username:
+    show_dashboard(username)
+
 # 保存数据
 def save_data(df, file_path):
     df.to_csv(file_path, index=False)
