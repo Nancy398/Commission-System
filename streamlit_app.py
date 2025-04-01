@@ -32,10 +32,12 @@ def read_file(name,sheet):
   df = pd.DataFrame(df.values[1:], columns=df.iloc[0])
   return df
 Commission = read_file("Leasing Database","Sheet2")
+Commission['Number of beds'] = Commission['Number of beds'].astype(int)
 Commission['Signed Date'] = pd.to_datetime(Commission['Signed Date'],format='mixed')
 Commission_own = Commission.loc[Commission['Property Type'] == 'Own Property']
 Commission_own.loc[Commission_own['Term'] == 'Long', 'Owner Bill'] = 600 * Commission_own['Number of beds']
 Commission_own.loc[Commission_own['Term'] == 'Short', 'Owner Bill'] = 300 * Commission_own['Number of beds']
+
 start_date = datetime(2024, 9, 1)  # 2024年11月1日
 end_date = datetime(2025, 4, 30) 
 col1, col2 = st.columns(2)
