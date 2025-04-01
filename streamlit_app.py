@@ -44,6 +44,7 @@ with col1:
         value=start_date,
         min_value=start_date,
         max_value=end_date
+    )
 with col2:
     end_selected = st.date_input(
         "To:",
