@@ -53,9 +53,9 @@ with col2:
         max_value=end_date
     )
 
-start_selected = pd.Timestamp(start_selected)
-end_selected = pd.Timestamp(end_selected)
-df_filtered = Commission_own[Commission_own["Signed Date"].between(start_selected,end_selected) ]
+# start_selected = pd.Timestamp(start_selected)
+# end_selected = pd.Timestamp(end_selected)
+df_filtered = Commission_own[Commission_own["Signed Date"].between(start_selected,end_selected)]
                                                                   
 Bill_Charge = pd.DataFrame()
 Bill_Charge['Bill Property Code'] = df_filtered['Property Name']
