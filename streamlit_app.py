@@ -31,9 +31,46 @@ def read_file(name,sheet):
   df = pd.DataFrame.from_records(rows)
   df = pd.DataFrame(df.values[1:], columns=df.iloc[0])
   return df
-df = read_file("Leasing Database","Sheet2")
-save_data(df,DEALS_FILE)
+Commission = read_file("Leasing Database","Sheet2")
+Commission_own = Commission.loc[Commission['Property Type'] == 'Own Property']
+Commission_own.loc[Commission_own['Term'] == 'Long', 'Owner Bill'] = 600 * Commission_own['Number of beds']
+Commission_own.loc[Commission_own['Term'] == 'Short', 'Owner Bill'] = 300 * Commission_own['Number of beds']
+start_date = datetime(2024, 9, 1)  # 2024年11月1日
+end_date = datetime(2025, 4, 30) 
+col1, col2 = st.columns(2)
+with col1:
+    start_selected = st.date_input(
+        "From:",
+        value=start_date,
+        min_value=start_date,
+        max_value=end_date
+with col2:
+    end_selected = st.date_input(
+        "To:",
+        value=end_date,
+        min_value=start_date,
+        max_value=end_date
+    )
 
+start_selected = pd.Timestamp(start_selected)
+end_selected = pd.Timestamp(end_selected)
+df_filtered = Commission_own[Commission_own["Signed Date"].between(start_selected,end_selected) ]
+                                                                  
+Bill_Charge = pd.DataFrame()
+Bill_Charge['Bill Property Code'] = df_filtered['Property Name']
+Bill_Charge['Bill Unit Name'] = ' '
+Bill_Charge['Payee Name'] = "Moo Housing Inc"
+Bill_Charge['Amount'] = df_filtered['Owner Bill']
+Bill_Charge['Bill Account'] = '6112'
+Bill_Charge['Desc'] = '6112'
+Bill_Charge['Description'] = df_filtered['Property']
+Bill_Charge['Bill Date'] = end_selected
+Bill_Charge['Due Date'] = end_selected
+
+st.dataframe(
+    Bill_Charge,
+    use_container_width=True,
+)
 # 数据文件路径
 USERS_FILE = "users.csv"
 DEALS_FILE = "deals.csv"
