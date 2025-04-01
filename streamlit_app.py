@@ -35,8 +35,8 @@ Commission = read_file("Leasing Database","Sheet2")
 Commission['Number of beds'] = Commission['Number of beds'].astype(int)
 Commission['Signed Date'] = pd.to_datetime(Commission['Signed Date'],format='mixed')
 Commission_own = Commission.loc[Commission['Property Type'] == 'Own Property']
-Commission_own.loc[Commission_own['Term'] == 'Long', 'Owner Bill'] = 600 * Commission_own['Number of beds']
-Commission_own.loc[Commission_own['Term'] == 'Short', 'Owner Bill'] = 300 * Commission_own['Number of beds']
+Commission_own.loc[Commission_own['Term'] == 'Long', 'Owner Bill'] = 600
+Commission_own.loc[Commission_own['Term'] == 'Short', 'Owner Bill'] = 300
 
 st.dataframe(
     Commission_own,
