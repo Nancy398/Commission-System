@@ -38,6 +38,11 @@ Commission_own = Commission.loc[Commission['Property Type'] == 'Own Property']
 Commission_own.loc[Commission_own['Term'] == 'Long', 'Owner Bill'] = 600 * Commission_own['Number of beds']
 Commission_own.loc[Commission_own['Term'] == 'Short', 'Owner Bill'] = 300 * Commission_own['Number of beds']
 
+st.dataframe(
+    Commission_own,
+    use_container_width=True,
+)
+
 start_date = datetime(2024, 9, 1)  # 2024年11月1日
 end_date = datetime(2025, 4, 30) 
 col1, col2 = st.columns(2)
