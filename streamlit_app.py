@@ -32,6 +32,7 @@ def read_file(name,sheet):
   df = pd.DataFrame(df.values[1:], columns=df.iloc[0])
   return df
 Commission = read_file("Leasing Database","Sheet2")
+Commission['Signed Date'] = pd.to_datetime(Commission['Signed Date'],format='mixed')
 Commission_own = Commission.loc[Commission['Property Type'] == 'Own Property']
 Commission_own.loc[Commission_own['Term'] == 'Long', 'Owner Bill'] = 600 * Commission_own['Number of beds']
 Commission_own.loc[Commission_own['Term'] == 'Short', 'Owner Bill'] = 300 * Commission_own['Number of beds']
@@ -53,8 +54,9 @@ with col2:
         max_value=end_date
     )
 
-# start_selected = pd.Timestamp(start_selected)
-# end_selected = pd.Timestamp(end_selected)
+
+start_selected = pd.Timestamp(start_selected)
+end_selected = pd.Timestamp(end_selected)
 df_filtered = Commission_own[Commission_own["Signed Date"].between(start_selected,end_selected)]
                                                                   
 Bill_Charge = pd.DataFrame()
