@@ -33,11 +33,8 @@ def read_file(name,sheet):
   return df
 Commission = read_file("Leasing Database","Sheet2")
 Commission['Number of beds'] = Commission['Number of beds'].astype(int)
-Commission_short = Commission.loc[Commission['Term'] == 'Short']
-Commission_short['Owner Bill'] = 300 * Commission_short['Number of beds']
-Commission_long = Commission.loc[Commission['Term'] == 'Long']
-Commission_long['Owner Bill'] = 300 * Commission_long['Number of beds']
-Commission = pd.concat([Commission_long,Commission_short])
+Commission.loc[Commission['Term'] == 'Short','Owner Charge'] = 300 * Commission['Number of beds']
+Commission.loc[Commission['Term'] == 'Long','Owner Charge'] = 600 * Commission['Number of beds']
 Commission['Signed Date'] = pd.to_datetime(Commission['Signed Date'],format='mixed')
 Commission_own = Commission.loc[Commission['Property Type'] == 'Own Property']
 
