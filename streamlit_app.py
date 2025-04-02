@@ -66,7 +66,7 @@ if page == "Login":
         user = find_user(email)
         
         if user:
-            stored_hashed_password = user["Password (hashed)"]
+            stored_hashed_password = user["Password"]
             if bcrypt.checkpw(password.encode(), stored_hashed_password.encode()):
                 st.success(f"✅ Welcome, {user['Name']} ({user['Role']})!")
             else:
@@ -85,7 +85,7 @@ elif page == "Super Admin":
         user = find_user(email)
         
         if user and user["Role"] == "SuperAdmin":
-            stored_hashed_password = user["Password (hashed)"]
+            stored_hashed_password = user["Password"]
             if bcrypt.checkpw(password.encode(), stored_hashed_password.encode()):
                 st.success("✅ Super Admin Logged In!")
                 
