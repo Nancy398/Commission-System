@@ -108,9 +108,9 @@ elif page == "Super Admin":
                 if 'new_role' not in st.session_state:
                     st.session_state.new_role = 'Admin'
 
-                new_email = st.text_input("User Email", value=st.session_state.new_email, key="new_email_input", label_visibility="hidden")
-                new_name = st.text_input("Full Name", value=st.session_state.new_name, key="new_name_input", label_visibility="hidden")
-                new_role = st.selectbox("Role", ["Admin", "Sales"], index=["Admin", "Sales"].index(st.session_state.new_role), key="new_role_input", label_visibility="hidden")
+                new_email = st.text_input("User Email", value=st.session_state.new_email, key="new_email_input")
+                new_name = st.text_input("Full Name", value=st.session_state.new_name, key="new_name_input")
+                new_role = st.selectbox("Role", ["Admin", "Sales"], index=["Admin", "Sales"].index(st.session_state.new_role), key="new_role_input")
 
                 
                 # Generate a default username based on the name
