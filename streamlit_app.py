@@ -66,8 +66,8 @@ if page == "Login":
         user = find_user(email)
         
         if user:
-            stored_hashed_password = user["Password"]
-            if bcrypt.checkpw(password.encode(), stored_hashed_password.encode()):
+            stored_password = user["Password"]  # 明文密码
+            if password == stored_password:
                 st.success(f"✅ Welcome, {user['Name']} ({user['Role']})!")
             else:
                 st.error("❌ Invalid password.")
@@ -85,8 +85,8 @@ elif page == "Super Admin":
         user = find_user(email)
         
         if user and user["Role"] == "SuperAdmin":
-            stored_hashed_password = user["Password"]
-            if bcrypt.checkpw(password.encode(), stored_hashed_password.encode()):
+            stored_password = user["Password"]  # 明文密码
+            if password == stored_password:
                 st.success("✅ Super Admin Logged In!")
                 
                 # Super Admin 创建用户
@@ -97,8 +97,8 @@ elif page == "Super Admin":
                 new_username = new_name.split()[0] + str(len(new_name))
                 
                 if st.button("Add User"):
-                    hashed_password = bcrypt.hashpw("temp_password".encode(), bcrypt.gensalt()).decode()
-                    add_user(new_email, new_name, new_role, new_username, hashed_password)
+                    # 直接存储明文密码，实际使用中应采取更安全的密码存储方式
+                    add_user(new_email, new_name, new_role, new_username, "temp_password")
                     st.success(f"✅ {new_name} ({new_role}) added successfully!")
             else:
                 st.error("❌ Incorrect password.")
