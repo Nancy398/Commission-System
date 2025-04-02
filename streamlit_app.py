@@ -112,10 +112,6 @@ elif page == "Super Admin":
                 new_name = st.text_input("Full Name", value=st.session_state.new_name, key="new_name_input")
                 new_role = st.selectbox("Role", ["Admin", "Sales"], index=["Admin", "Sales"].index(st.session_state.new_role), key="new_role_input")
 
-                
-                # Generate a default username based on the name
-                new_username = new_name.split()[0] + str(len(new_name)) if new_name.strip() else "default_username"
-
                 # Update session_state values
                 st.session_state.new_email = new_email
                 st.session_state.new_name = new_name
