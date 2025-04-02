@@ -37,9 +37,6 @@ Commission.loc[Commission['Term'].eq('Long'), 'Owner Bill'] = 600 * Commission['
 Commission.loc[Commission['Term'].eq('Short'), 'Owner Bill'] = 300 * Commission['Number of beds']
 Commission['Signed Date'] = pd.to_datetime(Commission['Signed Date'],format='mixed')
 Commission_own = Commission.loc[Commission['Property Type'] == 'Own Property']
-Commission_own = Commission_own.copy()
-Commission_own.loc[Commission_own['Term'].eq('Long'), 'Owner Bill'] = 600
-Commission_own.loc[Commission_own['Term'].eq('Short'), 'Owner Bill'] = 300
 
 st.dataframe(
     Commission_own,
