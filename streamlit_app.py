@@ -42,7 +42,7 @@ Commission['Signed Date'] = pd.to_datetime(Commission['Signed Date'],format='mix
 Commission_own = Commission.loc[Commission['Property Type'] == 'Own Property']
 
 st.dataframe(
-    Commission_own,
+    Commission_olong,
     use_container_width=True,
 )
 
