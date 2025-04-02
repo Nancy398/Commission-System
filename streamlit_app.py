@@ -59,8 +59,12 @@ page = st.sidebar.radio("", ["Login", "Super Admin", "Activate"])
 if page == "Login":
     st.title("🔑 User Login")
     
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
+    # 创建一个用于控制输入框显示的 flag
+    email_input = st.empty()
+    password_input = st.empty()
+
+    email = email_input.text_input("Email")
+    password = password_input.text_input("Password", type="password")
     
     if st.button("Login"):
         user = find_user(email)
@@ -68,6 +72,9 @@ if page == "Login":
         if user:
             stored_password = user["Password"]  # 明文密码
             if password == stored_password:
+                # 登录成功后，隐藏 Email 和 Password 输入框
+                email_input.empty()  # 隐藏 Email 输入框
+                password_input.empty()  # 隐藏 Password 输入框
                 st.success(f"✅ Welcome, {user['Name']} ({user['Role']})!")
             else:
                 st.error("❌ Invalid password.")
@@ -78,8 +85,11 @@ if page == "Login":
 elif page == "Super Admin":
     st.title("🛠️ Super Admin Panel")
     
-    email = st.text_input("Super Admin Email")
-    password = st.text_input("Password", type="password")
+    email_input = st.empty()
+    password_input = st.empty()
+
+    email = email_input.text_input("Super Admin Email")
+    password = password_input.text_input("Password", type="password")
     
     if st.button("Login as Super Admin"):
         user = find_user(email)
@@ -87,6 +97,9 @@ elif page == "Super Admin":
         if user and user["Role"] == "SuperAdmin":
             stored_password = user["Password"]  # 明文密码
             if password == stored_password:
+                # 登录成功后，隐藏 Email 和 Password 输入框
+                email_input.empty()
+                password_input.empty()
                 st.success("✅ Super Admin Logged In!")
                 
                 # Super Admin 创建用户
