@@ -10,15 +10,105 @@ from datetime import datetime
 from datetime import datetime, timedelta
 import time
 
-import streamlit as st
+import bcrypt
+import uuid
 
-# 保存数据
-def save_data(df, file_path):
-    df.to_csv(file_path, index=False)
+def authenticate_gspread():
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    credentials = Credentials.from_service_account_info(
+    st.secrets["GOOGLE_APPLICATION_CREDENTIALS"], 
+    scopes=scope)
+    gc = gspread.authorize(credentials)
+    return gc.open(SHEET_NAME).sheet1
+
+def get_users():
+    sheet = authenticate_gspread()
+    return sheet.get_all_records()
+
+# 查找用户
+def find_user(email):
+    users = get_users()
+    for user in users:
+        if user["Email"] == email:
+            return user
+    return None
+
+# 添加用户
+def add_user(email, name, role, username, password_hashed):
+    sheet = authenticate_gspread()
+    sheet.append_row([email, name, role, username, password_hashed])
+
+# 更新用户密码（用于激活账户）
+def update_user_password(email, new_password):
+    sheet = authenticate_gspread()
+    users = sheet.get_all_values()
+
+    for i, row in enumerate(users):
+        if row[0] == email:  # Email 在第一列
+            sheet.update_cell(i+1, 5, new_password)  # 密码在第5列
+            return True
+    return False
+
+# ---- Streamlit 界面 ----
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("", ["Login", "Super Admin", "Activate"])
+
+# ---- 登录页面 ----
+if page == "Login":
+    st.title("🔑 User Login")
     
-USERS_FILE = "users.csv"
-DEALS_FILE = "deals.csv"  
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
+    
+    if st.button("Login"):
+        user = find_user(email)
+        
+        if user:
+            stored_hashed_password = user["Password (hashed)"]
+            if bcrypt.checkpw(password.encode(), stored_hashed_password.encode()):
+                st.success(f"✅ Welcome, {user['Name']} ({user['Role']})!")
+            else:
+                st.error("❌ Invalid password.")
+        else:
+            st.error("❌ User not found.")
 
+# ---- Super Admin 页面 ----
+elif page == "Super Admin":
+    st.title("🛠️ Super Admin Panel")
+    
+    email = st.text_input("Super Admin Email")
+    password = st.text_input("Password", type="password")
+    
+    if st.button("Login as Super Admin"):
+        user = find_user(email)
+        
+        if user and user["Role"] == "SuperAdmin":
+            stored_hashed_password = user["Password (hashed)"]
+            if bcrypt.checkpw(password.encode(), stored_hashed_password.encode()):
+                st.success("✅ Super Admin Logged In!")
+                
+                # Super Admin 创建用户
+                st.subheader("Add New User")
+                new_email = st.text_input("User Email")
+                new_name = st.text_input("Full Name")
+                new_role = st.selectbox("Role", ["Admin", "Sales"])
+                new_username = new_name.split()[0] + str(len(new_name))
+                
+                if st.button("Add User"):
+                    hashed_password = bcrypt.hashpw("temp_password".encode(), bcrypt.gensalt()).decode()
+                    add_user(new_email, new_name, new_role, new_username, hashed_password)
+                    st.success(f"✅ {new_name} ({new_role}) added successfully!")
+            else:
+                st.error("❌ Incorrect password.")
+        else:
+            st.error("❌ Access Denied. Only Super Admin can access this panel.")
+
+# ---- 账户激活页面 ----
+elif page == "Activate":
+    st.title("🔐 Activate Your Account")
+    
+    email = st.text_input("Enter your email")
+    
 # @st.cache_data(ttl=300)
 def read_file(name,sheet):
   scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
@@ -85,36 +175,7 @@ st.download_button(
     file_name="Owner Charge.csv",
     mime="text/csv"
 )
-# # 数据文件路径
-# USERS_FILE = "users.csv"
-# DEALS_FILE = "deals.csv"
-# # FEEDBACKS_FILE = "data/feedbacks.csv"
 
-# # 读取数据
-# users_df = pd.read_csv(USERS_FILE)
-# # deals_df = pd.read_csv(DEALS_FILE)
-# # feedbacks_df = pd.read_csv(FEEDBACKS_FILE)
-
-# # 保存数据
-# def save_data(df, file_path):
-#     df.to_csv(file_path, index=False)
-
-# # Streamlit 应用主入口
-# def main():
-#     st.title("Commission System")
-
-#     # 登录或注册界面选择
-#     if "logged_in" not in st.session_state:
-#         st.session_state.logged_in = False
-
-#     if not st.session_state.logged_in:
-#         option = st.sidebar.selectbox("Choose", ["Log in", "Register"])
-
-#         if option == "Log in":
-#             login()
-#         elif option == "Register":
-#             register()
-#         return
 
 #     # 已登录用户界面
 #     st.sidebar.header(f"Welcome, {st.session_state.user['name']}")
