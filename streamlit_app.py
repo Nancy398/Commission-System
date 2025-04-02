@@ -34,7 +34,7 @@ def read_file(name,sheet):
 Commission = read_file("Leasing Database","Sheet2")
 Commission['Number of beds'] = Commission['Number of beds'].astype(int)
 Commission['Owner Bill'] = 600 * Commission['Number of beds']
-Commission.loc[Commission['Term']=='Short', 'Owner Bill'] = 300 * Commission['Number of beds']
+Commission.loc[Commission['Term']=='Short', 'Owners Bill'] = 300 * Commission['Number of beds']
 Commission['Signed Date'] = pd.to_datetime(Commission['Signed Date'],format='mixed')
 Commission_own = Commission.loc[Commission['Property Type'] == 'Own Property']
 
