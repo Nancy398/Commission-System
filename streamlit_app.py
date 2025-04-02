@@ -13,6 +13,8 @@ import time
 import bcrypt
 import uuid
 
+SHEET_NAME = "UserDatabase" 
+
 def authenticate_gspread():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     credentials = Credentials.from_service_account_info(
