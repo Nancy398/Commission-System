@@ -13,21 +13,25 @@ import time
 import bcrypt
 import uuid
 
+# Sheet name for User Database
 SHEET_NAME = "UserDatabase" 
 
+# Function to authenticate with Google Sheets
 def authenticate_gspread():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     credentials = Credentials.from_service_account_info(
-    st.secrets["GOOGLE_APPLICATION_CREDENTIALS"], 
-    scopes=scope)
+        st.secrets["GOOGLE_APPLICATION_CREDENTIALS"], 
+        scopes=scope
+    )
     gc = gspread.authorize(credentials)
     return gc.open(SHEET_NAME).sheet1
 
+# Get all users from the sheet
 def get_users():
     sheet = authenticate_gspread()
     return sheet.get_all_records()
 
-# 查找用户
+# Find a user by email
 def find_user(email):
     users = get_users()
     for user in users:
@@ -35,53 +39,53 @@ def find_user(email):
             return user
     return None
 
-# 添加用户
+# Add a new user to the sheet
 def add_user(email, name, role, username, password_hashed):
     sheet = authenticate_gspread()
     sheet.append_row([email, name, role, username, password_hashed])
 
-# 更新用户密码（用于激活账户）
+# Update user's password (for activation)
 def update_user_password(email, new_password):
     sheet = authenticate_gspread()
     users = sheet.get_all_values()
 
     for i, row in enumerate(users):
-        if row[0] == email:  # Email 在第一列
-            sheet.update_cell(i+1, 5, new_password)  # 密码在第5列
+        if row[0] == email:  # Email is in the first column
+            sheet.update_cell(i + 1, 5, new_password)  # Password is in the 5th column
             return True
     return False
 
-# ---- Streamlit 界面 ----
+# ---- Streamlit interface ----
 st.sidebar.title("Navigation")
 page = st.sidebar.radio("", ["Login", "Super Admin", "Activate"])
 
-# ---- 登录页面 ----
+# ---- Login Page ----
 if page == "Login":
     st.title("🔑 User Login")
     
-    # 创建一个用于控制输入框显示的 flag
+    # Create empty containers for inputs
     email_input = st.empty()
     password_input = st.empty()
 
-    email = email_input.text_input("Email")
-    password = password_input.text_input("Password", type="password")
+    email = email_input.text_input("Email", key="login_email")
+    password = password_input.text_input("Password", type="password", key="login_password")
     
     if st.button("Login"):
         user = find_user(email)
         
         if user:
-            stored_password = user["Password"]  # 明文密码
+            stored_password = user["Password"]  # Assuming password is stored in clear text (replace with hashed version in production)
             if password == stored_password:
-                # 登录成功后，隐藏 Email 和 Password 输入框
-                email_input.empty()  # 隐藏 Email 输入框
-                password_input.empty()  # 隐藏 Password 输入框
+                # Hide Email and Password inputs after successful login
+                email_input.empty()
+                password_input.empty()
                 st.success(f"✅ Welcome, {user['Name']} ({user['Role']})!")
             else:
                 st.error("❌ Invalid password.")
         else:
             st.error("❌ User not found.")
 
-# ---- Super Admin 页面 ----
+# ---- Super Admin Page ----
 elif page == "Super Admin":
     st.title("🛠️ Super Admin Panel")
     
@@ -92,14 +96,14 @@ elif page == "Super Admin":
         user = find_user(email)
         
         if user and user["Role"] == "SuperAdmin":
-            stored_password = user["Password"]  # 明文密码
+            stored_password = user["Password"]
             if password == stored_password:
                 st.success("✅ Super Admin Logged In!")
                 
-                # Super Admin 创建用户
+                # Super Admin can add new users
                 st.subheader("Add New User")
                 
-                # 使用 session_state 来保留输入值
+                # Use session_state to store form data
                 if 'new_email' not in st.session_state:
                     st.session_state.new_email = ''
                 if 'new_name' not in st.session_state:
@@ -110,17 +114,23 @@ elif page == "Super Admin":
                 new_email = st.text_input("User Email", value=st.session_state.new_email, key="new_email_input")
                 new_name = st.text_input("Full Name", value=st.session_state.new_name, key="new_name_input")
                 new_role = st.selectbox("Role", ["Admin", "Sales"], index=["Admin", "Sales"].index(st.session_state.new_role), key="new_role_input")
-                new_username = new_name.split()[0] + str(len(new_name)) if new_name.strip() else "default_username"
                 
-                # 将输入保存到 session_state
+                # Generate a default username based on the name
+                new_username = new_name.split()[0] + str(len(new_name)) if new_name.strip() else "default_username"
+
+                # Update session_state values
                 st.session_state.new_email = new_email
                 st.session_state.new_name = new_name
                 st.session_state.new_role = new_role
 
-                if st.button("Add User"):
-                    # 直接存储明文密码，实际使用中应采取更安全的密码存储方式
-                    add_user(new_email, new_name, new_role, new_username, "temp_password")
-                    st.success(f"✅ {new_name} ({new_role}) added successfully!")
+                # Check if the email already exists
+                if find_user(new_email):
+                    st.error("❌ Email already exists. Please use a different email.")
+                else:
+                    if st.button("Add User"):
+                        # Store plain text password for simplicity here, use hashing in production
+                        add_user(new_email, new_name, new_role, new_username, "temp_password")
+                        st.success(f"✅ {new_name} ({new_role}) added successfully!")
             else:
                 st.error("❌ Incorrect password.")
         else:
