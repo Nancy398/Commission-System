@@ -40,11 +40,6 @@ Commission.loc[Commission['Term Catorgy'] == 'Long','Owner Charge'] = 600 * Comm
 Commission['Signed Date'] = pd.to_datetime(Commission['Signed Date'],format='mixed')
 Commission_own = Commission.loc[Commission['Property Type'] == 'Own Property']
 
-st.dataframe(
-    Commission_own,
-    use_container_width=True,
-)
-
 start_date = datetime(2024, 9, 1)  # 2024年11月1日
 end_date = datetime(2025, 4, 30) 
 col1, col2 = st.columns(2)
@@ -82,6 +77,14 @@ Bill_Charge['Due Date'] = end_selected
 st.dataframe(
     Bill_Charge,
     use_container_width=True,
+)
+
+csv_data = Bill_Charge.to_csv(index=False).encode('utf-8')
+st.download_button(
+    label="📥 Download Owner Charge CSV",
+    data=csv_data,
+    file_name="Owner Charge.csv",
+    mime="text/csv"
 )
 # # 数据文件路径
 # USERS_FILE = "users.csv"
