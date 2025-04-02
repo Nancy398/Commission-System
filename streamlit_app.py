@@ -85,11 +85,8 @@ if page == "Login":
 elif page == "Super Admin":
     st.title("🛠️ Super Admin Panel")
     
-    email_input = st.empty()
-    password_input = st.empty()
-
-    email = email_input.text_input("Super Admin Email")
-    password = password_input.text_input("Password", type="password")
+    email = st.text_input("Super Admin Email", key="admin_email_input")
+    password = st.text_input("Password", type="password", key="admin_password_input")
     
     if st.button("Login as Super Admin"):
         user = find_user(email)
@@ -97,18 +94,29 @@ elif page == "Super Admin":
         if user and user["Role"] == "SuperAdmin":
             stored_password = user["Password"]  # 明文密码
             if password == stored_password:
-                # 登录成功后，隐藏 Email 和 Password 输入框
-                email_input.empty()
-                password_input.empty()
                 st.success("✅ Super Admin Logged In!")
                 
                 # Super Admin 创建用户
                 st.subheader("Add New User")
-                new_email = st.text_input("User Email")
-                new_name = st.text_input("Full Name")
-                new_role = st.selectbox("Role", ["Admin", "Sales"])
-                new_username = new_name.split()[0] + str(len(new_name))
                 
+                # 使用 session_state 来保留输入值
+                if 'new_email' not in st.session_state:
+                    st.session_state.new_email = ''
+                if 'new_name' not in st.session_state:
+                    st.session_state.new_name = ''
+                if 'new_role' not in st.session_state:
+                    st.session_state.new_role = 'Admin'
+
+                new_email = st.text_input("User Email", value=st.session_state.new_email, key="new_email_input")
+                new_name = st.text_input("Full Name", value=st.session_state.new_name, key="new_name_input")
+                new_role = st.selectbox("Role", ["Admin", "Sales"], index=["Admin", "Sales"].index(st.session_state.new_role), key="new_role_input")
+                new_username = new_name.split()[0] + str(len(new_name)) if new_name.strip() else "default_username"
+                
+                # 将输入保存到 session_state
+                st.session_state.new_email = new_email
+                st.session_state.new_name = new_name
+                st.session_state.new_role = new_role
+
                 if st.button("Add User"):
                     # 直接存储明文密码，实际使用中应采取更安全的密码存储方式
                     add_user(new_email, new_name, new_role, new_username, "temp_password")
