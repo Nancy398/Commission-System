@@ -42,7 +42,7 @@ def find_user(email):
 # Add a new user to the sheet
 def add_user(email, name, role, username, password_hashed):
     sheet = authenticate_gspread()
-    sheet.append_row([email, name, role, username, password_hashed])
+    sheet.append_row([email, name, role, password_hashed])
 
 # ---- Streamlit interface ----
 st.sidebar.title("Navigation")
@@ -109,14 +109,14 @@ elif page == "Super Admin":
                     st.session_state.new_role = 'Admin'
 
                 new_email = st.text_input("User Email", value=st.session_state.new_email, key="new_email_input")
-                new_name = st.text_input("Full Name", value=st.session_state.new_name, key="new_name_input")
-                new_role = st.selectbox("Role", ["Admin", "Sales"], index=["Admin", "Sales"].index(st.session_state.new_role), key="new_role_input")
-
-                # Update session_state values
                 st.session_state.new_email = new_email
+                new_name = st.text_input("Full Name", value=st.session_state.new_name, key="new_name_input")
                 st.session_state.new_name = new_name
+                new_role = st.selectbox("Role", ["Admin", "Sales"], index=["Admin", "Sales"].index(st.session_state.new_role), key="new_role_input")
                 st.session_state.new_role = new_role
 
+                # Update session_state values
+        
                 # Check if the email already exists
                 if find_user(new_email):
                     st.error("❌ Email already exists. Please use a different email.")
