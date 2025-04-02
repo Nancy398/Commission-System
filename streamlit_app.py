@@ -37,7 +37,7 @@ Commission_short = Commission.loc[Commission['Term'] == 'Short']
 Commission_short['Owner Bill'] = 300 * Commission_short['Number of beds']
 Commission_long = Commission.loc[Commission['Term'] == 'Long']
 Commission_long['Owner Bill'] = 300 * Commission_long['Number of beds']
-Commission = pd.concat(Commission_long,Commission_short)
+Commission = pd.concat([Commission_long,Commission_short])
 Commission['Signed Date'] = pd.to_datetime(Commission['Signed Date'],format='mixed')
 Commission_own = Commission.loc[Commission['Property Type'] == 'Own Property']
 
