@@ -44,17 +44,6 @@ def add_user(email, name, role, username, password_hashed):
     sheet = authenticate_gspread()
     sheet.append_row([email, name, role, username, password_hashed])
 
-# Update user's password (for activation)
-def update_user_password(email, new_password):
-    sheet = authenticate_gspread()
-    users = sheet.get_all_values()
-
-    for i, row in enumerate(users):
-        if row[0] == email:  # Email is in the first column
-            sheet.update_cell(i + 1, 5, new_password)  # Password is in the 5th column
-            return True
-    return False
-
 # ---- Streamlit interface ----
 st.sidebar.title("Navigation")
 page = st.sidebar.radio("", ["Login", "Super Admin", "Activate"])
@@ -63,12 +52,18 @@ page = st.sidebar.radio("", ["Login", "Super Admin", "Activate"])
 if page == "Login":
     st.title("🔑 User Login")
     
-    # Create empty containers for inputs
+    # Create empty containers for inputs to manage state
     email_input = st.empty()
     password_input = st.empty()
 
-    email = email_input.text_input("Email", key="login_email")
-    password = password_input.text_input("Password", type="password", key="login_password")
+    # Use session_state to persist email and password between re-renders
+    if 'email' not in st.session_state:
+        st.session_state.email = ''
+    if 'password' not in st.session_state:
+        st.session_state.password = ''
+
+    email = email_input.text_input("Email", value=st.session_state.email, key="login_email")
+    password = password_input.text_input("Password", type="password", value=st.session_state.password, key="login_password")
     
     if st.button("Login"):
         user = find_user(email)
@@ -79,6 +74,8 @@ if page == "Login":
                 # Hide Email and Password inputs after successful login
                 email_input.empty()
                 password_input.empty()
+                st.session_state.email = email  # Store email in session_state
+                st.session_state.password = password  # Store password in session_state
                 st.success(f"✅ Welcome, {user['Name']} ({user['Role']})!")
             else:
                 st.error("❌ Invalid password.")
@@ -135,6 +132,7 @@ elif page == "Super Admin":
                 st.error("❌ Incorrect password.")
         else:
             st.error("❌ Access Denied. Only Super Admin can access this panel.")
+
 
 # ---- 账户激活页面 ----
 elif page == "Activate":
