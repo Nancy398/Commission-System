@@ -9,35 +9,29 @@ from gspread_dataframe import set_with_dataframe
 from datetime import datetime
 from datetime import datetime, timedelta
 import time
-
 import bcrypt
 import uuid
-
-# Sheet name for User Database
-SHEET_NAME = "UserDatabase" 
 
 import streamlit as st
 import gspread
 from google.oauth2.service_account import Credentials
 
 SHEET_NAME = "UserDatabase"
+ACTIVATION_URL = "http://your-streamlit-app.com/?activate="  # 修改为你的 Streamlit 应用地址
 
-# Authenticate Google Sheets
+# ---- Google Sheets 认证 ----
 def authenticate_gspread():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    credentials = Credentials.from_service_account_info(
-        st.secrets["GOOGLE_APPLICATION_CREDENTIALS"], 
-        scopes=scope
-    )
+    credentials = Credentials.from_service_account_info(st.secrets["GOOGLE_APPLICATION_CREDENTIALS"], scopes=scope)
     gc = gspread.authorize(credentials)
     return gc.open(SHEET_NAME).sheet1
 
-# Get all users from Google Sheets
+# ---- 获取所有用户 ----
 def get_users():
     sheet = authenticate_gspread()
     return sheet.get_all_records()
 
-# Find user in Google Sheets
+# ---- 查找用户 ----
 def find_user(email):
     users = get_users()
     for user in users:
@@ -45,45 +39,84 @@ def find_user(email):
             return user
     return None
 
-# Add a new user
-def add_user(email, name, role, password_hashed):
+# ---- 添加新用户 ----
+def add_user(email, name, role):
     sheet = authenticate_gspread()
-    sheet.append_row([email, name, role, password_hashed])
+    activation_code = f"ACT-{email}"  # 生成唯一激活码
+    sheet.append_row([email, name, role, "temp_password", activation_code])
+    return activation_code  # 返回激活码
 
-# ---- Streamlit Interface ----
+# ---- 更新用户密码（激活账户） ----
+def update_user_password(email, new_password):
+    sheet = authenticate_gspread()
+    users = sheet.get_all_values()
+    for i, row in enumerate(users):
+        if row[0] == email:  # Email 在第一列
+            sheet.update_cell(i + 1, 4, new_password)  # 更新密码（列4）
+            sheet.update_cell(i + 1, 5, "Activated")  # 移除激活码（列5）
+            return True
+    return False
 
+# ---- Streamlit 界面 ----
 st.title("🔑 User Login")
 
-# Add a login form
-email = st.text_input("Email", key="email_input")
-password = st.text_input("Password", type="password", key="password_input")
+# ---- 处理激活链接 ----
+activation_code = st.query_params.get("activate", None)
+if activation_code:
+    user_found = False
+    users = get_users()
+    for user in users:
+        if user["Password"] == activation_code:  # 激活码存储在“密码”列
+            user_found = True
+            st.title("🔓 Account Activation")
+            new_password = st.text_input("Enter new password", type="password")
+            confirm_password = st.text_input("Confirm new password", type="password")
 
-# Button to submit login credentials
-if st.button("Login"):
-    user = find_user(email)
-    
-    if user:
-        stored_password = user["Password"]  # Assuming you have plaintext passwords here for now
-        if password == stored_password:
-            st.session_state.logged_in = True
-            st.session_state.user_name = user["Name"]
-            st.session_state.user_role = user["Role"]
-            st.success(f"✅ Welcome, {user['Name']}!")
+            if st.button("Activate"):
+                if new_password and new_password == confirm_password:
+                    update_user_password(user["Email"], new_password)
+                    st.success("✅ Account activated! You can now log in.")
+                else:
+                    st.error("❌ Passwords do not match.")
+            break
+
+    if not user_found:
+        st.error("❌ Invalid activation link.")
+    st.stop()
+
+# ---- 登录界面 ----
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+    st.session_state.user_name = ""
+    st.session_state.user_role = ""
+
+if not st.session_state.logged_in:
+    email = st.text_input("Email", key="email_input")
+    password = st.text_input("Password", type="password", key="password_input")
+
+    if st.button("Login"):
+        user = find_user(email)
+        if user:
+            if password == user["Password"]:
+                st.session_state.logged_in = True
+                st.session_state.user_name = user["Name"]
+                st.session_state.user_role = user["Role"]
+                st.success(f"✅ Welcome, {user['Name']}!")
+                st.rerun()
+            else:
+                st.error("❌ Invalid password.")
         else:
-            st.error("❌ Invalid password.")
-    else:
-        st.error("❌ User not found.")
+            st.error("❌ User not found.")
 
-# Check if the user is logged in
-if "logged_in" in st.session_state and st.session_state.logged_in:
-    # Show the user different sections based on their role
-    role = st.session_state.user_role
-    if role == "SuperAdmin":
-        page = st.radio("Choose an action", ["Super Admin Panel", "Add New User", "Other"])
+else:
+    st.sidebar.write(f"👤 Logged in as: **{st.session_state.user_name}** ({st.session_state.user_role})")
+
+    if st.session_state.user_role == "SuperAdmin":
+        page = st.radio("Choose an action", ["Super Admin Panel", "Add New User"])
         
         if page == "Super Admin Panel":
             st.subheader("🛠️ Super Admin Panel")
-            st.write("You are in the Super Admin Panel.")
+            st.write("Welcome to the Super Admin Panel.")
         
         elif page == "Add New User":
             st.subheader("🛠️ Add New User")
@@ -93,38 +126,20 @@ if "logged_in" in st.session_state and st.session_state.logged_in:
             
             if st.button("Add User"):
                 if new_email and new_name:
-                    add_user(new_email, new_name, new_role, "temp_password")
+                    activation_code = add_user(new_email, new_name, new_role)
+                    activation_link = f"{ACTIVATION_URL}{activation_code}"
                     st.success(f"✅ {new_name} ({new_role}) added successfully!")
+                    st.write(f"🔗 Activation Link: [Click here to activate]({activation_link})")
+                    st.code(activation_link)  # 显示纯文本链接，方便复制
                 else:
                     st.error("❌ Please fill in all fields.")
-        
-        elif page == "Other":
-            st.write("Other SuperAdmin actions here.")
-            
-    elif role == "Admin":
-        page = st.radio("Choose an action", ["Admin Panel", "Other"])
-        
-        if page == "Admin Panel":
-            st.subheader("🛠️ Admin Panel")
-            # Admin-specific options
-            st.write("Admin options will go here.")
-        
-        elif page == "Other":
-            st.write("Other Admin actions here.")
-    
-    elif role == "Sales":
-        page = st.radio("Choose an action", ["Sales Panel", "Other"])
-        
-        if page == "Sales Panel":
-            st.subheader("💼 Sales Panel")
-            # Sales-specific options
-            st.write("Sales options will go here.")
-        
-        elif page == "Other":
-            st.write("Other Sales actions here.")
 
-else:
-    st.write("Please log in to access the panels.")
+    if st.button("Logout"):
+        st.session_state.logged_in = False
+        st.session_state.user_name = ""
+        st.session_state.user_role = ""
+        st.rerun()
+
     
 # # @st.cache_data(ttl=300)
 # def read_file(name,sheet):
