@@ -16,7 +16,13 @@ import uuid
 # Sheet name for User Database
 SHEET_NAME = "UserDatabase" 
 
-# Function to authenticate with Google Sheets
+import streamlit as st
+import gspread
+from google.oauth2.service_account import Credentials
+
+SHEET_NAME = "UserDatabase"
+
+# Authenticate Google Sheets
 def authenticate_gspread():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     credentials = Credentials.from_service_account_info(
@@ -26,12 +32,12 @@ def authenticate_gspread():
     gc = gspread.authorize(credentials)
     return gc.open(SHEET_NAME).sheet1
 
-# Get all users from the sheet
+# Get all users from Google Sheets
 def get_users():
     sheet = authenticate_gspread()
     return sheet.get_all_records()
 
-# Find a user by email
+# Find user in Google Sheets
 def find_user(email):
     users = get_users()
     for user in users:
@@ -39,103 +45,86 @@ def find_user(email):
             return user
     return None
 
-# Add a new user to the sheet
-def add_user(email, name, role, username, password_hashed):
+# Add a new user
+def add_user(email, name, role, password_hashed):
     sheet = authenticate_gspread()
     sheet.append_row([email, name, role, password_hashed])
 
-# ---- Streamlit interface ----
-st.sidebar.title("Navigation")
-page = st.sidebar.radio("", ["Login", "Super Admin", "Activate"])
+# ---- Streamlit Interface ----
 
-# ---- Login Page ----
-if page == "Login":
-    st.title("🔑 User Login")
+st.title("🔑 User Login")
+
+# Add a login form
+email = st.text_input("Email", key="email_input")
+password = st.text_input("Password", type="password", key="password_input")
+
+# Button to submit login credentials
+if st.button("Login"):
+    user = find_user(email)
     
-    # Create empty containers for inputs to manage state
-    email_input = st.empty()
-    password_input = st.empty()
-
-    # Use session_state to persist email and password between re-renders
-    if 'email' not in st.session_state:
-        st.session_state.email = ''
-    if 'password' not in st.session_state:
-        st.session_state.password = ''
-
-    email = email_input.text_input("Email", value=st.session_state.email, key="login_email")
-    password = password_input.text_input("Password", type="password", value=st.session_state.password, key="login_password")
-    
-    if st.button("Login"):
-        user = find_user(email)
-        
-        if user:
-            stored_password = user["Password"]  # Assuming password is stored in clear text (replace with hashed version in production)
-            if password == stored_password:
-                # Hide Email and Password inputs after successful login
-                email_input.empty()
-                password_input.empty()
-                st.session_state.email = email  # Store email in session_state
-                st.session_state.password = password  # Store password in session_state
-                st.success(f"✅ Welcome, {user['Name']} ({user['Role']})!")
-            else:
-                st.error("❌ Invalid password.")
+    if user:
+        stored_password = user["Password"]  # Assuming you have plaintext passwords here for now
+        if password == stored_password:
+            st.session_state.logged_in = True
+            st.session_state.user_name = user["Name"]
+            st.session_state.user_role = user["Role"]
+            st.success(f"✅ Welcome, {user['Name']}!")
         else:
-            st.error("❌ User not found.")
+            st.error("❌ Invalid password.")
+    else:
+        st.error("❌ User not found.")
 
-# ---- Super Admin Page ----
-elif page == "Super Admin":
-    st.title("🛠️ Super Admin Panel")
-    
-    email = st.text_input("Super Admin Email", key="admin_email_input")
-    password = st.text_input("Password", type="password", key="admin_password_input")
-    
-    if st.button("Login as Super Admin"):
-        user = find_user(email)
+# Check if the user is logged in
+if "logged_in" in st.session_state and st.session_state.logged_in:
+    # Show the user different sections based on their role
+    role = st.session_state.user_role
+    if role == "SuperAdmin":
+        page = st.radio("Choose an action", ["Super Admin Panel", "Add New User", "Other"])
         
-        if user and user["Role"] == "SuperAdmin":
-            stored_password = user["Password"]
-            if password == stored_password:
-                st.success("✅ Super Admin Logged In!")
-                
-                # Super Admin can add new users
-                st.subheader("Add New User")
-                
-                # Use session_state to store form data
-                if 'new_email' not in st.session_state:
-                    st.session_state.new_email = ''
-                if 'new_name' not in st.session_state:
-                    st.session_state.new_name = ''
-                if 'new_role' not in st.session_state:
-                    st.session_state.new_role = 'Admin'
-
-                new_email = st.text_input("User Email", value=st.session_state.new_email, key="new_email_input")
-                st.session_state.new_email = new_email
-                new_name = st.text_input("Full Name", value=st.session_state.new_name, key="new_name_input")
-                st.session_state.new_name = new_name
-                new_role = st.selectbox("Role", ["Admin", "Sales"], index=["Admin", "Sales"].index(st.session_state.new_role), key="new_role_input")
-                st.session_state.new_role = new_role
-
-                # Update session_state values
+        if page == "Super Admin Panel":
+            st.subheader("🛠️ Super Admin Panel")
+            st.write("You are in the Super Admin Panel.")
         
-                # Check if the email already exists
-                if find_user(new_email):
-                    st.error("❌ Email already exists. Please use a different email.")
+        elif page == "Add New User":
+            st.subheader("🛠️ Add New User")
+            new_email = st.text_input("User Email")
+            new_name = st.text_input("Full Name")
+            new_role = st.selectbox("Role", ["Admin", "Sales"])
+            
+            if st.button("Add User"):
+                if new_email and new_name:
+                    add_user(new_email, new_name, new_role, "temp_password")
+                    st.success(f"✅ {new_name} ({new_role}) added successfully!")
                 else:
-                    if st.button("Add User"):
-                        # Store plain text password for simplicity here, use hashing in production
-                        add_user(new_email, new_name, new_role, new_username, "temp_password")
-                        st.success(f"✅ {new_name} ({new_role}) added successfully!")
-            else:
-                st.error("❌ Incorrect password.")
-        else:
-            st.error("❌ Access Denied. Only Super Admin can access this panel.")
-
-
-# ---- 账户激活页面 ----
-elif page == "Activate":
-    st.title("🔐 Activate Your Account")
+                    st.error("❌ Please fill in all fields.")
+        
+        elif page == "Other":
+            st.write("Other SuperAdmin actions here.")
+            
+    elif role == "Admin":
+        page = st.radio("Choose an action", ["Admin Panel", "Other"])
+        
+        if page == "Admin Panel":
+            st.subheader("🛠️ Admin Panel")
+            # Admin-specific options
+            st.write("Admin options will go here.")
+        
+        elif page == "Other":
+            st.write("Other Admin actions here.")
     
-    email = st.text_input("Enter your email")
+    elif role == "Sales":
+        page = st.radio("Choose an action", ["Sales Panel", "Other"])
+        
+        if page == "Sales Panel":
+            st.subheader("💼 Sales Panel")
+            # Sales-specific options
+            st.write("Sales options will go here.")
+        
+        elif page == "Other":
+            st.write("Other Sales actions here.")
+
+else:
+    st.write("Please log in to access the panels.")
     
 # # @st.cache_data(ttl=300)
 # def read_file(name,sheet):
