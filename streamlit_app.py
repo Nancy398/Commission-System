@@ -65,7 +65,7 @@ def update_user_password(email, new_password):
 st.title("🔑 User Login")
 
 # ---- 处理激活链接 ----
-activation_params = st.experimental_get_query_params()  # 获取所有 URL 参数
+activation_params = st.query_params
 activation_code = activation_params.get("activate", [None])[0]  # 取 "activate" 参数
 st.write(activation_code)
 # 如果 URL 里有 activation_code，则显示激活界面
