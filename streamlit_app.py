@@ -21,6 +21,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 
 import streamlit as st
+import time
 
 # 页面标题
 st.markdown("""
@@ -40,20 +41,23 @@ st.markdown("""
         }
         .btn {
             display: block;
-            width: 200px;
-            padding: 10px;
-            margin: 10px auto;
+            width: 250px;
+            padding: 15px;
+            margin: 20px auto;
             font-size: 18px;
             font-weight: bold;
             text-align: center;
-            background-color: #2980b9;
+            background: linear-gradient(45deg, #2980b9, #3498db);
             color: white;
-            border-radius: 10px;
+            border-radius: 12px;
+            box-shadow: 0px 8px 15px rgba(41, 128, 185, 0.3);
+            border: none;
             transition: all 0.3s ease;
         }
         .btn:hover {
-            background-color: #3498db;
-            box-shadow: 0px 4px 15px rgba(41, 128, 185, 0.3);
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            box-shadow: 0px 15px 25px rgba(41, 128, 185, 0.4);
+            cursor: pointer;
         }
         .centered {
             display: flex;
@@ -68,21 +72,36 @@ st.markdown("""
             font-size: 14px;
             color: #95a5a6;
         }
+        .question {
+            font-size: 22px;
+            color: #2c3e50;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-out;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
     </style>
 """, unsafe_allow_html=True)
 
 # 页面内容
 st.markdown('<div class="main-title">Welcome to Leasing Board!</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Please log in to access your account and manage leasing data.</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">Manage your leasing data easily and securely</div>', unsafe_allow_html=True)
 
-# 页面按钮
-col1, col2 = st.columns([1, 1])
+# 问题提示
+question = st.empty()  # 用来逐步显示问题
+question.markdown('<div class="question">What do you want to do today?</div>', unsafe_allow_html=True)
 
-with col1:
+# 动态显示按钮
+with st.container():
+    time.sleep(1)
     if st.button("Login", key="login_button", help="Login to your account"):
         st.experimental_set_query_params(page="login")  # 跳转到登录页面
 
-with col2:
+    time.sleep(1)
     if st.button("Leasing Data", key="leasing_data_button", help="Access leasing data"):
         st.experimental_set_query_params(page="leasing_data")  # 跳转到Leasing Data 页面
 
