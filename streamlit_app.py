@@ -219,10 +219,10 @@ elif page == "activate":
     
     for user in users:
         activation_code = st.text_input("Enter your activation code")
+        new_password = st.text_input("Enter new password", type="password")
+        confirm_password = st.text_input("Confirm new password", type="password")
         if user["ActivationCode"] == activation_code:  # 假设“激活码”列存的是激活码
             user_found = True
-            new_password = st.text_input("Enter new password", type="password")
-            confirm_password = st.text_input("Confirm new password", type="password")
     
             if st.button("Activate"):
                 if new_password and new_password == confirm_password:
