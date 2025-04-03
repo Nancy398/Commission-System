@@ -56,7 +56,6 @@ def update_user_password(email, new_password):
 # 获取 URL 参数
 query_params = st.query_params
 page = query_params.get("page",'home')# 默认显示登录页面
-st.write(page)
 
 
 # **🔹 主界面**
@@ -213,30 +212,30 @@ elif page == "SuperAdmin":
     if st.button("Logout"):
         st.query_params.update({"page": "login"})
         
-    elif page == "activate":
-        st.title("🔓 Account Activation")
-        user_found = False
-        users = get_users()  # 获取用户数据
+elif page == "activate":
+    st.title("🔓 Account Activation")
+    user_found = False
+    users = get_users()  # 获取用户数据
     
-        for user in users:
-            activation_code = st.text_input("Enter your activation code", type="password")
-            if user["ActivationCode"] == activation_code:  # 假设“激活码”列存的是激活码
-                user_found = True
-                new_password = st.text_input("Enter new password", type="password")
-                confirm_password = st.text_input("Confirm new password", type="password")
+    for user in users:
+        activation_code = st.text_input("Enter your activation code", type="password")
+        if user["ActivationCode"] == activation_code:  # 假设“激活码”列存的是激活码
+            user_found = True
+            new_password = st.text_input("Enter new password", type="password")
+            confirm_password = st.text_input("Confirm new password", type="password")
     
-                if st.button("Activate"):
-                    if new_password and new_password == confirm_password:
-                        update_user_password(user["Email"], new_password)  # 更新密码
-                        st.success("✅ Account activated! You can now log in.")
-                        st.rerun()  # **强制刷新 Streamlit 页面**
-                    else:
-                        st.error("❌ Passwords do not match.")
-                break
+            if st.button("Activate"):
+                if new_password and new_password == confirm_password:
+                    update_user_password(user["Email"], new_password)  # 更新密码
+                    st.success("✅ Account activated! You can now log in.")
+                    st.rerun()  # **强制刷新 Streamlit 页面**
+                else:
+                    st.error("❌ Passwords do not match.")
+            break
     
-        if not user_found:
-            st.error("❌ Invalid activation link.")
-        st.stop()
+    if not user_found:
+        st.error("❌ Invalid activation link.")
+    st.stop()
 
         
 
