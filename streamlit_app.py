@@ -55,7 +55,7 @@ def update_user_password(email, new_password):
 
 # 获取 URL 参数
 query_params = st.query_params
-page = query_params.get("page", ["home"])  # 默认显示登录页面
+page = query_params.get("page",['home'])  # 默认显示登录页面
 
 
 # **🔹 主界面**
@@ -126,10 +126,14 @@ if page == "home":
         }
     </style>
 """, unsafe_allow_html=True)
-    st.write(page)
     st.markdown('<div class="main-title">Welcome to Leasing Board!</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-title">Manage your leasing data easily and securely</div>', unsafe_allow_html=True)
-    
+
+    # Show question after a delay
+    question = st.empty()
+    question.markdown('<div class="question">What do you want to do today?</div>', unsafe_allow_html=True)
+
+    # Buttons for navigation
     st.markdown("""
         <div class="btn-container">
             <a href="?page=login" class="btn btn-login">Login</a>
