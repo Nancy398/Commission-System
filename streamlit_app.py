@@ -233,8 +233,8 @@ elif page == "activate":
                     if new_password and new_password == confirm_password:
                         update_user_password(user["Email"], new_password)  # Update password
                         st.success("✅ Account activated! You can now log in.")
-                        st.rerun()
                         st.query_params.update({"page": "login"})
+                        st.rerun()
                     else:
                         st.error("❌ Passwords do not match.")
                 break
