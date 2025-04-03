@@ -126,7 +126,7 @@ elif page == "sales":
         st.query_params.update({"page": "login"})  # 退出回到登录页
 
 # **🔹 Super Admin 页面**
-elif page == "superadmin":
+elif page == "SuperAdmin":
     st.markdown('<div class="main-title">🛠️ Super Admin Panel</div>', unsafe_allow_html=True)
     st.write("Welcome, Super Admin! You have full access to the system.")
     page = st.radio("Choose an action", ["Super Admin Panel", "Add New User"])
