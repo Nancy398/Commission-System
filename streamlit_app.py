@@ -56,7 +56,6 @@ def update_user_password(email, new_password):
 # 获取 URL 参数
 query_params = st.query_params
 page = query_params.get("page",'home')# 默认显示登录页面
-st.write(page)
 
 
 # **🔹 主界面**
