@@ -102,15 +102,13 @@ question = st.empty()
 time.sleep(0.5)  # 模拟渐显效果
 question.markdown('<div class="question">What do you want to do today?</div>', unsafe_allow_html=True)
 
-col1, col2 = st.columns(2)
+page = st.radio("Select an option", ("Login", "Leasing Data"))
 
-with col1:
-    if st.button("Login", key="login_btn", help="Go to Login Page", use_container_width=True):
-        st.switch_page("login.py")
+if page == "Login":
+    st.switch_page("login.py")  # 直接跳转到 login 页面
 
-with col2:
-    if st.button("Leasing Data", key="leasing_btn", help="View Leasing Data", use_container_width=True):
-        st.switch_page("leasing_data.py")
+elif page == "Leasing Data":
+    st.switch_page("leasing_data")  # 直接跳转到 Leasing Data 页面
 
 # 页面底部（版权或额外信息）
 st.markdown('<div class="footer">© 2025 Leasing Board - All rights reserved.</div>', unsafe_allow_html=True)
