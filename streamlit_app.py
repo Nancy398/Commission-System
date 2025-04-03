@@ -23,7 +23,13 @@ from google.oauth2.service_account import Credentials
 import streamlit as st
 import time
 
-# 页面标题和样式
+import streamlit as st
+
+# Read query parameters
+query_params = st.query_params
+page = query_params.get("page", ["home"])[0]  # Default to "home" if no page is set
+
+# Custom Styling
 st.markdown("""
     <style>
         .main-title {
@@ -61,12 +67,10 @@ st.markdown("""
             color: white !important;
         }
         .btn-login {
-            background-color: #A7C7E7;  /* 蓝色 */
-            color: white;
+            background-color: #A7C7E7;  /* 淡蓝色 */
         }
         .btn-leasing {
-            background-color: #F7CAC9;  /* 绿色 */
-            color: white;
+            background-color: #F7CAC9;  /* 淡粉色 */
         }
         .btn:hover {
             transform: scale(1.1);
@@ -93,24 +97,36 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 页面内容
-st.markdown('<div class="main-title">Welcome to Leasing Board!</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-title">Manage your leasing data easily and securely</div>', unsafe_allow_html=True)
+# Handle page routing
+if page == "home":
+    st.markdown('<div class="main-title">Welcome to Leasing Board!</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-title">Manage your leasing data easily and securely</div>', unsafe_allow_html=True)
 
-# 逐步显示问题文本
-question = st.empty()
-time.sleep(0.5)  # 模拟渐显效果
-question.markdown('<div class="question">What do you want to do today?</div>', unsafe_allow_html=True)
+    # Show question after a delay
+    question = st.empty()
+    question.markdown('<div class="question">What do you want to do today?</div>', unsafe_allow_html=True)
 
-page = st.radio("Select an option", ("Login", "Leasing Data"))
+    # Buttons for navigation
+    st.markdown("""
+        <div class="btn-container">
+            <a href="?page=login" class="btn btn-login">Login</a>
+            <a href="?page=leasing_data" class="btn btn-leasing">Leasing Data</a>
+        </div>
+    """, unsafe_allow_html=True)
 
-if page == "Login":
-    st.switch_page("login")  # 直接跳转到 login 页面
+elif page == "login":
+    st.markdown('<div class="main-title">🔑 Login</div>', unsafe_allow_html=True)
+    st.write("Enter your credentials below:")
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
+    if st.button("Login"):
+        st.success("✅ Successfully logged in!")
+        st.query_params.clear()  # Clear query params after login
 
-elif page == "Leasing Data":
-    st.switch_page("leasing_data")  # 直接跳转到 Leasing Data 页面
+elif page == "leasing_data":
+    st.markdown('<div class="main-title">📊 Leasing Data</div>', unsafe_allow_html=True)
+    st.write("This is the leasing data page.")
 
-# 页面底部（版权或额外信息）
 st.markdown('<div class="footer">© 2025 Leasing Board - All rights reserved.</div>', unsafe_allow_html=True)
 
 
