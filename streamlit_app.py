@@ -16,6 +16,10 @@ import streamlit as st
 import gspread
 from google.oauth2.service_account import Credentials
 
+import streamlit as st
+import gspread
+from google.oauth2.service_account import Credentials
+
 SHEET_NAME = "UserDatabase"
 ACTIVATION_URL = "http://your-streamlit-app.com/?activate="  # 修改为你的 Streamlit 应用地址
 
@@ -94,13 +98,19 @@ if not st.session_state.logged_in:
     email = st.text_input("Email", key="email_input")
     password = st.text_input("Password", type="password", key="password_input")
 
-if st.button("Add User"):
-    if new_email and new_name:
-        activation_code = add_user(new_email, new_name, new_role, "temp_password")
-        st.success(f"✅ {new_name} ({new_role}) added successfully!")
-        st.write(f"🔑 Activation Code: `{activation_code}`")
-    else:
-        st.error("❌ Please fill in all fields.")
+    if st.button("Login"):
+        user = find_user(email)
+        if user:
+            if password == user["Password"]:
+                st.session_state.logged_in = True
+                st.session_state.user_name = user["Name"]
+                st.session_state.user_role = user["Role"]
+                st.success(f"✅ Welcome, {user['Name']}!")
+                st.rerun()
+            else:
+                st.error("❌ Invalid password.")
+        else:
+            st.error("❌ User not found.")
 
 else:
     st.sidebar.write(f"👤 Logged in as: **{st.session_state.user_name}** ({st.session_state.user_role})")
@@ -134,7 +144,6 @@ else:
         st.session_state.user_role = ""
         st.rerun()
 
-    
 # # @st.cache_data(ttl=300)
 # def read_file(name,sheet):
 #   scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
