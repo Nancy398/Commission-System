@@ -57,11 +57,11 @@ st.markdown("""
             cursor: pointer;
         }
         .btn-login {
-            background: linear-gradient(45deg, #3498db, #2980b9);
+            background-color: #3498db;  /* 蓝色 */
             color: white;
         }
         .btn-leasing {
-            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            background-color: #2ecc71;  /* 绿色 */
             color: white;
         }
         .btn:hover {
@@ -110,16 +110,19 @@ col1, col2 = st.columns(2)
 # 动态显示按钮
 with col1:
     time.sleep(1)
-    if st.button("Login", key="login_button", help="Login to your account", on_click=None, args=None, disabled=False):
+    if st.button("Login", key="login_button", help="Login to your account", on_click=None, args=None, disabled=False, 
+                 css="btn btn-login"):
         st.experimental_set_query_params(page="login")  # 跳转到登录页面
 
 with col2:
     time.sleep(1)
-    if st.button("Leasing Data", key="leasing_data_button", help="Access leasing data", on_click=None, args=None, disabled=False):
+    if st.button("Leasing Data", key="leasing_data_button", help="Access leasing data", on_click=None, args=None, disabled=False, 
+                 css="btn btn-leasing"):
         st.experimental_set_query_params(page="leasing_data")  # 跳转到Leasing Data 页面
 
 # 页面底部（版权或额外信息）
 st.markdown('<div class="footer">© 2025 Leasing Board - All rights reserved.</div>', unsafe_allow_html=True)
+
 
 
 
