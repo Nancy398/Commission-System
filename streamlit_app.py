@@ -94,19 +94,13 @@ if not st.session_state.logged_in:
     email = st.text_input("Email", key="email_input")
     password = st.text_input("Password", type="password", key="password_input")
 
-    if st.button("Login"):
-        user = find_user(email)
-        if user:
-            if password == user["Password"]:
-                st.session_state.logged_in = True
-                st.session_state.user_name = user["Name"]
-                st.session_state.user_role = user["Role"]
-                st.success(f"✅ Welcome, {user['Name']}!")
-                st.rerun()
-            else:
-                st.error("❌ Invalid password.")
-        else:
-            st.error("❌ User not found.")
+    if st.button("Add User"):
+    if new_email and new_name:
+        activation_code = add_user(new_email, new_name, new_role, "temp_password")
+        st.success(f"✅ {new_name} ({new_role}) added successfully!")
+        st.write(f"🔑 Activation Code: `{activation_code}`")
+    else:
+        st.error("❌ Please fill in all fields.")
 
 else:
     st.sidebar.write(f"👤 Logged in as: **{st.session_state.user_name}** ({st.session_state.user_role})")
