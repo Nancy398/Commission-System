@@ -27,7 +27,7 @@ import streamlit as st
 
 # Read query parameters
 query_params = st.query_params
-page = query_params.get("page", ["home"])[0]  # Default to "home" if no page is set
+page = query_params.get("page", ["home"])  # Default to "home" if no page is set
 
 # Custom Styling
 st.markdown("""
