@@ -90,9 +90,9 @@ elif page == "login":
     email = st.text_input("Email")
     password = st.text_input("Password", type="password")
     if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-    st.session_state.user_name = ""
-    st.session_state.user_role = ""
+        st.session_state.logged_in = False
+        st.session_state.user_name = ""
+        st.session_state.user_role = ""
 
     if not st.session_state.logged_in:
         email = st.text_input("Email", key="email_input")
