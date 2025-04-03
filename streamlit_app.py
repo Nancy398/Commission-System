@@ -155,7 +155,7 @@ elif page == "SuperAdmin":
     if st.button("Logout"):
         st.query_params.update({"page": "login"})
         
-    elif page == "Activate":
+    elif page == "activate":
         st.title("🔓 Account Activation")
         user_found = False
         users = get_users()  # 获取用户数据
