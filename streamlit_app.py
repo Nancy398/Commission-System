@@ -23,7 +23,10 @@ from google.oauth2.service_account import Credentials
 import streamlit as st
 import time
 
-# 页面标题
+import streamlit as st
+import time
+
+# 页面标题和样式
 st.markdown("""
     <style>
         .main-title {
@@ -41,28 +44,29 @@ st.markdown("""
         }
         .btn {
             display: block;
-            width: 200px;
+            width: 250px;
             padding: 20px;
-            margin: 10px;
+            margin: 10px auto;
             font-size: 20px;
             font-weight: bold;
             text-align: center;
-            border-radius: 12px;
+            border-radius: 30px;
             border: none;
-            transition: all 0.3s ease;
-            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s ease;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
         }
         .btn-login {
-            background: linear-gradient(45deg, #2980b9, #3498db);
+            background: linear-gradient(45deg, #3498db, #2980b9);
             color: white;
         }
         .btn-leasing {
-            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
             color: white;
         }
         .btn:hover {
-            cursor: pointer;
-            box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.1);
+            transform: scale(1.1);
+            box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.25);
         }
         .centered {
             display: flex;
@@ -116,6 +120,7 @@ with col2:
 
 # 页面底部（版权或额外信息）
 st.markdown('<div class="footer">© 2025 Leasing Board - All rights reserved.</div>', unsafe_allow_html=True)
+
 
 
 
