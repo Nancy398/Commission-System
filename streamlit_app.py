@@ -60,11 +60,11 @@ st.markdown("""
             text-decoration: none;
         }
         .btn-login {
-            background-color: #3498db;  /* 蓝色 */
+            background-color: #A7C7E7;  /* 蓝色 */
             color: white;
         }
         .btn-leasing {
-            background-color: #2ecc71;  /* 绿色 */
+            background-color: #F7CAC9;  /* 绿色 */
             color: white;
         }
         .btn:hover {
