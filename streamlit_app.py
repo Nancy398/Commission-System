@@ -28,7 +28,7 @@ import streamlit as st
 import streamlit as st
 
 SHEET_NAME = "UserDatabase"
-ACTIVATION_URL = "https://commission-system-moohousing.streamlit.app/?activate="  # 修改为你的 Streamlit 应用地址
+ACTIVATION_URL = "https://commission-system-moohousing.streamlit.app/?page=activate"  # 修改为你的 Streamlit 应用地址
 
 # ---- Google Sheets 认证 ----
 def authenticate_gspread():
@@ -86,7 +86,7 @@ if page == "home":
 
 # **🔹 登录页面**
 elif page == "login":
-    st.markdown('<div class="main-title">🔑 Login</div>', unsafe_allow_html=True)
+    st.title("🔑 User Login")
     if "logged_in" not in st.session_state:
         st.session_state.logged_in = False
         st.session_state.user_name = ""
@@ -144,16 +144,43 @@ elif page == "SuperAdmin":
         if st.button("Add User"):
             if new_email and new_name:
                 activation_code = add_user(new_email, new_name, new_role)
-                activation_link = f"{ACTIVATION_URL}{activation_code}"
+                activation_link = f"{ACTIVATION_URL}"
                 st.success(f"✅ {new_name} ({new_role}) added successfully!")
                 st.write(f"🔗 Activation Link: [Click here to activate]({activation_link})")
+                st.write(f"🔗 Activation Code:({activation_code}) ")
                 st.code(activation_link)  # 显示纯文本链接，方便复制
             else:
                 st.error("❌ Please fill in all fields.")
 
     if st.button("Logout"):
         st.query_params.update({"page": "login"})
+        
+    elif page == "Activate":
+        st.title("🔓 Account Activation")
+        user_found = False
+        users = get_users()  # 获取用户数据
+    
+        for user in users:
+            activation_code = st.text_input("Enter your activation code", type="password")
+            if user["ActivationCode"] == activation_code:  # 假设“激活码”列存的是激活码
+                user_found = True
+                new_password = st.text_input("Enter new password", type="password")
+                confirm_password = st.text_input("Confirm new password", type="password")
+    
+                if st.button("Activate"):
+                    if new_password and new_password == confirm_password:
+                        update_user_password(user["Email"], new_password)  # 更新密码
+                        st.success("✅ Account activated! You can now log in.")
+                        st.rerun()  # **强制刷新 Streamlit 页面**
+                    else:
+                        st.error("❌ Passwords do not match.")
+                break
+    
+        if not user_found:
+            st.error("❌ Invalid activation link.")
+        st.stop()
 
+        
 
 # **🔹 版权信息**
 st.markdown('<div class="footer">© 2025 Leasing Board - All rights reserved.</div>', unsafe_allow_html=True)
