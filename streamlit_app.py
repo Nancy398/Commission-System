@@ -177,7 +177,7 @@ elif page == "Admin":
         st.query_params.update({"page": "login"})  # 退出回到登录页
 
 # **🔹 Sales 页面**
-elif page == "sales":
+elif page == "Sales":
     st.markdown('<div class="main-title">📈 Sales Dashboard</div>', unsafe_allow_html=True)
     st.write("Welcome, Sales team! View and manage sales data.")
     if st.button("Logout"):
