@@ -21,7 +21,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 
 SHEET_NAME = "UserDatabase"
-ACTIVATION_URL = "/https://commission-system-moohousing.streamlit.app/activate="  # 修改为你的 Streamlit 应用地址
+ACTIVATION_URL = "https://commission-system-moohousing.streamlit.app/activate="  # 修改为你的 Streamlit 应用地址
 
 # ---- Google Sheets 认证 ----
 def authenticate_gspread():
