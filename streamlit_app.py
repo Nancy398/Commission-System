@@ -87,8 +87,6 @@ if page == "home":
 # **🔹 登录页面**
 elif page == "login":
     st.markdown('<div class="main-title">🔑 Login</div>', unsafe_allow_html=True)
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
     if "logged_in" not in st.session_state:
         st.session_state.logged_in = False
         st.session_state.user_name = ""
