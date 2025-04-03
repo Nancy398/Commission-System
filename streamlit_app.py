@@ -65,21 +65,26 @@ def update_user_password(email, new_password):
 st.title("🔑 User Login")
 
 # ---- 处理激活链接 ----
-activation_code = st.query_params.get("activate", None)
+activation_params = st.experimental_get_query_params()  # 获取所有 URL 参数
+activation_code = activation_params.get("activate", [None])[0]  # 取 "activate" 参数
+
+# 如果 URL 里有 activation_code，则显示激活界面
 if activation_code:
+    st.title("🔓 Account Activation")
     user_found = False
-    users = get_users()
+    users = get_users()  # 获取用户数据
+
     for user in users:
-        if user["Password"] == activation_code:  # 激活码存储在“密码”列
+        if user["ActivationCode"] == activation_code:  # 假设“激活码”列存的是激活码
             user_found = True
-            st.title("🔓 Account Activation")
             new_password = st.text_input("Enter new password", type="password")
             confirm_password = st.text_input("Confirm new password", type="password")
 
             if st.button("Activate"):
                 if new_password and new_password == confirm_password:
-                    update_user_password(user["Email"], new_password)
+                    update_user_password(user["Email"], new_password)  # 更新密码
                     st.success("✅ Account activated! You can now log in.")
+                    st.experimental_rerun()  # **强制刷新 Streamlit 页面**
                 else:
                     st.error("❌ Passwords do not match.")
             break
@@ -87,6 +92,7 @@ if activation_code:
     if not user_found:
         st.error("❌ Invalid activation link.")
     st.stop()
+
 
 # ---- 登录界面 ----
 if "logged_in" not in st.session_state:
