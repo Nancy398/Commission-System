@@ -60,6 +60,72 @@ page = query_params.get("page", ["home"])  # 默认显示登录页面
 
 # **🔹 主界面**
 if page == "home":
+    st.markdown("""
+    <style>
+        .main-title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 36px;
+            font-weight: bold;
+            margin-top: 50px;
+        }
+        .sub-title {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .btn {
+            display: inline-block;
+            width: 200px;
+            padding: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 30px;
+            border: none;
+            transition: all 0.4s ease;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
+            cursor: pointer;
+            text-decoration: none;
+            color: white !important;
+        }
+        .btn-login {
+            background-color: #A7C7E7;  /* 淡蓝色 */
+        }
+        .btn-leasing {
+            background-color: #F7CAC9;  /* 淡粉色 */
+        }
+        .btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.25);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 14px;
+            color: #95a5a6;
+        }
+        .question {
+            font-size: 22px;
+            color: #2c3e50;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-out;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+    </style>
+""", unsafe_allow_html=True)
     st.write(page)
     st.markdown('<div class="main-title">Welcome to Leasing Board!</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-title">Manage your leasing data easily and securely</div>', unsafe_allow_html=True)
