@@ -20,136 +20,206 @@ import streamlit as st
 import gspread
 from google.oauth2.service_account import Credentials
 
-SHEET_NAME = "UserDatabase"
-ACTIVATION_URL = "https://commission-system-moohousing.streamlit.app/?activate="  # 修改为你的 Streamlit 应用地址
+import streamlit as st
 
-# ---- Google Sheets 认证 ----
-def authenticate_gspread():
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    credentials = Credentials.from_service_account_info(st.secrets["GOOGLE_APPLICATION_CREDENTIALS"], scopes=scope)
-    gc = gspread.authorize(credentials)
-    return gc.open(SHEET_NAME).sheet1
+# 页面标题
+st.markdown("""
+    <style>
+        .main-title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 36px;
+            font-weight: bold;
+            margin-top: 50px;
+        }
+        .sub-title {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+        .btn {
+            display: block;
+            width: 200px;
+            padding: 10px;
+            margin: 10px auto;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            background-color: #2980b9;
+            color: white;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #3498db;
+            box-shadow: 0px 4px 15px rgba(41, 128, 185, 0.3);
+        }
+        .centered {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 70vh;
+            flex-direction: column;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 14px;
+            color: #95a5a6;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-# ---- 获取所有用户 ----
-def get_users():
-    sheet = authenticate_gspread()
-    return sheet.get_all_records()
+# 页面内容
+st.markdown('<div class="main-title">Welcome to Leasing Board!</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">Please log in to access your account and manage leasing data.</div>', unsafe_allow_html=True)
 
-# ---- 查找用户 ----
-def find_user(email):
-    users = get_users()
-    for user in users:
-        if user["Email"] == email:
-            return user
-    return None
+# 页面按钮
+col1, col2 = st.columns([1, 1])
 
-# ---- 添加新用户 ----
-def add_user(email, name, role):
-    sheet = authenticate_gspread()
-    activation_code = f"ACT-{email}"  # 生成唯一激活码
-    sheet.append_row([email, name, role, "temp_password", activation_code])
-    return activation_code  # 返回激活码
+with col1:
+    if st.button("Login", key="login_button", help="Login to your account"):
+        st.experimental_set_query_params(page="login")  # 跳转到登录页面
 
-# ---- 更新用户密码（激活账户） ----
-def update_user_password(email, new_password):
-    sheet = authenticate_gspread()
-    users = sheet.get_all_values()
-    for i, row in enumerate(users):
-        if row[0] == email:  # Email 在第一列
-            sheet.update_cell(i + 1, 4, new_password)  # 更新密码（列4）
-            sheet.update_cell(i + 1, 5, "Activated")  # 移除激活码（列5）
-            return True
-    return False
+with col2:
+    if st.button("Leasing Data", key="leasing_data_button", help="Access leasing data"):
+        st.experimental_set_query_params(page="leasing_data")  # 跳转到Leasing Data 页面
 
-# ---- Streamlit 界面 ----
-st.title("🔑 User Login")
-
-# ---- 处理激活链接 ----
-
-activation_params = st.query_params
-activation_code = activation_params.get("activate", [None])
-st.write(activation_code)
-# 如果 URL 里有 activation_code，则显示激活界面
-if activation_code:
-    st.title("🔓 Account Activation")
-    user_found = False
-    users = get_users()  # 获取用户数据
-
-    for user in users:
-        if user["ActivationCode"] == activation_code:  # 假设“激活码”列存的是激活码
-            user_found = True
-            new_password = st.text_input("Enter new password", type="password")
-            confirm_password = st.text_input("Confirm new password", type="password")
-
-            if st.button("Activate"):
-                if new_password and new_password == confirm_password:
-                    update_user_password(user["Email"], new_password)  # 更新密码
-                    st.success("✅ Account activated! You can now log in.")
-                    st.rerun()  # **强制刷新 Streamlit 页面**
-                else:
-                    st.error("❌ Passwords do not match.")
-            break
-
-    if not user_found:
-        st.error("❌ Invalid activation link.")
-    st.stop()
+# 页面底部（版权或额外信息）
+st.markdown('<div class="footer">© 2025 Leasing Board - All rights reserved.</div>', unsafe_allow_html=True)
 
 
-# ---- 登录界面 ----
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-    st.session_state.user_name = ""
-    st.session_state.user_role = ""
+# SHEET_NAME = "UserDatabase"
+# ACTIVATION_URL = "https://commission-system-moohousing.streamlit.app/?activate="  # 修改为你的 Streamlit 应用地址
 
-if not st.session_state.logged_in:
-    email = st.text_input("Email", key="email_input")
-    password = st.text_input("Password", type="password", key="password_input")
+# # ---- Google Sheets 认证 ----
+# def authenticate_gspread():
+#     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+#     credentials = Credentials.from_service_account_info(st.secrets["GOOGLE_APPLICATION_CREDENTIALS"], scopes=scope)
+#     gc = gspread.authorize(credentials)
+#     return gc.open(SHEET_NAME).sheet1
 
-    if st.button("Login"):
-        user = find_user(email)
-        if user:
-            if password == user["Password"]:
-                st.session_state.logged_in = True
-                st.session_state.user_name = user["Name"]
-                st.session_state.user_role = user["Role"]
-                st.success(f"✅ Welcome, {user['Name']}!")
-                st.rerun()
-            else:
-                st.error("❌ Invalid password.")
-        else:
-            st.error("❌ User not found.")
+# # ---- 获取所有用户 ----
+# def get_users():
+#     sheet = authenticate_gspread()
+#     return sheet.get_all_records()
 
-else:
-    st.sidebar.write(f"👤 Logged in as: **{st.session_state.user_name}** ({st.session_state.user_role})")
+# # ---- 查找用户 ----
+# def find_user(email):
+#     users = get_users()
+#     for user in users:
+#         if user["Email"] == email:
+#             return user
+#     return None
 
-    if st.session_state.user_role == "SuperAdmin":
-        page = st.radio("Choose an action", ["Super Admin Panel", "Add New User"])
+# # ---- 添加新用户 ----
+# def add_user(email, name, role):
+#     sheet = authenticate_gspread()
+#     activation_code = f"ACT-{email}"  # 生成唯一激活码
+#     sheet.append_row([email, name, role, "temp_password", activation_code])
+#     return activation_code  # 返回激活码
+
+# # ---- 更新用户密码（激活账户） ----
+# def update_user_password(email, new_password):
+#     sheet = authenticate_gspread()
+#     users = sheet.get_all_values()
+#     for i, row in enumerate(users):
+#         if row[0] == email:  # Email 在第一列
+#             sheet.update_cell(i + 1, 4, new_password)  # 更新密码（列4）
+#             sheet.update_cell(i + 1, 5, "Activated")  # 移除激活码（列5）
+#             return True
+#     return False
+
+# # ---- Streamlit 界面 ----
+# st.title("🔑 User Login")
+
+# # ---- 处理激活链接 ----
+
+# activation_params = st.query_params
+# activation_code = activation_params.get("activate", [None])
+# st.write(activation_code)
+# # 如果 URL 里有 activation_code，则显示激活界面
+# if activation_code:
+#     st.title("🔓 Account Activation")
+#     user_found = False
+#     users = get_users()  # 获取用户数据
+
+#     for user in users:
+#         if user["ActivationCode"] == activation_code:  # 假设“激活码”列存的是激活码
+#             user_found = True
+#             new_password = st.text_input("Enter new password", type="password")
+#             confirm_password = st.text_input("Confirm new password", type="password")
+
+#             if st.button("Activate"):
+#                 if new_password and new_password == confirm_password:
+#                     update_user_password(user["Email"], new_password)  # 更新密码
+#                     st.success("✅ Account activated! You can now log in.")
+#                     st.rerun()  # **强制刷新 Streamlit 页面**
+#                 else:
+#                     st.error("❌ Passwords do not match.")
+#             break
+
+#     if not user_found:
+#         st.error("❌ Invalid activation link.")
+#     st.stop()
+
+
+# # ---- 登录界面 ----
+# if "logged_in" not in st.session_state:
+#     st.session_state.logged_in = False
+#     st.session_state.user_name = ""
+#     st.session_state.user_role = ""
+
+# if not st.session_state.logged_in:
+#     email = st.text_input("Email", key="email_input")
+#     password = st.text_input("Password", type="password", key="password_input")
+
+#     if st.button("Login"):
+#         user = find_user(email)
+#         if user:
+#             if password == user["Password"]:
+#                 st.session_state.logged_in = True
+#                 st.session_state.user_name = user["Name"]
+#                 st.session_state.user_role = user["Role"]
+#                 st.success(f"✅ Welcome, {user['Name']}!")
+#                 st.rerun()
+#             else:
+#                 st.error("❌ Invalid password.")
+#         else:
+#             st.error("❌ User not found.")
+
+# else:
+#     st.sidebar.write(f"👤 Logged in as: **{st.session_state.user_name}** ({st.session_state.user_role})")
+
+#     if st.session_state.user_role == "SuperAdmin":
+#         page = st.radio("Choose an action", ["Super Admin Panel", "Add New User"])
         
-        if page == "Super Admin Panel":
-            st.subheader("🛠️ Super Admin Panel")
-            st.write("Welcome to the Super Admin Panel.")
+#         if page == "Super Admin Panel":
+#             st.subheader("🛠️ Super Admin Panel")
+#             st.write("Welcome to the Super Admin Panel.")
         
-        elif page == "Add New User":
-            st.subheader("🛠️ Add New User")
-            new_email = st.text_input("User Email")
-            new_name = st.text_input("Full Name")
-            new_role = st.selectbox("Role", ["Admin", "Sales"])
+#         elif page == "Add New User":
+#             st.subheader("🛠️ Add New User")
+#             new_email = st.text_input("User Email")
+#             new_name = st.text_input("Full Name")
+#             new_role = st.selectbox("Role", ["Admin", "Sales"])
             
-            if st.button("Add User"):
-                if new_email and new_name:
-                    activation_code = add_user(new_email, new_name, new_role)
-                    activation_link = f"{ACTIVATION_URL}{activation_code}"
-                    st.success(f"✅ {new_name} ({new_role}) added successfully!")
-                    st.write(f"🔗 Activation Link: [Click here to activate]({activation_link})")
-                    st.code(activation_link)  # 显示纯文本链接，方便复制
-                else:
-                    st.error("❌ Please fill in all fields.")
+#             if st.button("Add User"):
+#                 if new_email and new_name:
+#                     activation_code = add_user(new_email, new_name, new_role)
+#                     activation_link = f"{ACTIVATION_URL}{activation_code}"
+#                     st.success(f"✅ {new_name} ({new_role}) added successfully!")
+#                     st.write(f"🔗 Activation Link: [Click here to activate]({activation_link})")
+#                     st.code(activation_link)  # 显示纯文本链接，方便复制
+#                 else:
+#                     st.error("❌ Please fill in all fields.")
 
-    if st.button("Logout"):
-        st.session_state.logged_in = False
-        st.session_state.user_name = ""
-        st.session_state.user_role = ""
-        st.rerun()
+#     if st.button("Logout"):
+#         st.session_state.logged_in = False
+#         st.session_state.user_name = ""
+#         st.session_state.user_role = ""
+#         st.rerun()
 
 # # @st.cache_data(ttl=300)
 # def read_file(name,sheet):
