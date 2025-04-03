@@ -214,28 +214,35 @@ elif page == "SuperAdmin":
         
 elif page == "activate":
     st.title("🔓 Account Activation")
-    user_found = False
-    users = get_users()  # 获取用户数据
     
-    for user in users:
-        activation_code = st.text_input("Enter your activation code")
-        new_password = st.text_input("Enter new password", type="password")
-        confirm_password = st.text_input("Confirm new password", type="password")
-        if user["ActivationCode"] == activation_code:  # 假设“激活码”列存的是激活码
-            user_found = True
+    # Show activation form
+    activation_code = st.text_input("Enter your activation code")
+    new_password = st.text_input("Enter new password", type="password")
+    confirm_password = st.text_input("Confirm new password", type="password")
     
-            if st.button("Activate"):
-                if new_password and new_password == confirm_password:
-                    update_user_password(user["Email"], new_password)  # 更新密码
-                    st.success("✅ Account activated! You can now log in.")
-                    st.rerun()  # **强制刷新 Streamlit 页面**
-                else:
-                    st.error("❌ Passwords do not match.")
-            break
+    if activation_code:
+        # Search for the user with the given activation code
+        user_found = False
+        users = get_users()
+        
+        for user in users:
+            if user["ActivationCode"] == activation_code:
+                user_found = True
+                
+                if st.button("Activate"):
+                    if new_password and new_password == confirm_password:
+                        update_user_password(user["Email"], new_password)  # Update password
+                        st.success("✅ Account activated! You can now log in.")
+                        st.rerun()  # Refresh Streamlit page
+                    else:
+                        st.error("❌ Passwords do not match.")
+                break
+        
+        if not user_found:
+            st.error("❌ Invalid activation code.")
     
-    if not user_found:
-        st.error("❌ Invalid activation link.")
-    st.stop()
+    else:
+        st.info("Please enter your activation code to proceed.")
 
         
 
