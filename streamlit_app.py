@@ -155,6 +155,7 @@ elif page == "login":
     
         if st.button("Login"):
             user = find_user(email)
+            st.write(user["Password"])
             if user:
                 if password == user["Password"]:
                     st.session_state.logged_in = True
