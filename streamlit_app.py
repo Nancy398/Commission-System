@@ -111,14 +111,6 @@ elif page == "login":
             else:
                 st.error("❌ User not found.")
 
-    # if st.button("Login"):
-    #     if email in USER_DATABASE and USER_DATABASE[email][0] == password:
-    #         role = USER_DATABASE[email][1]  # 获取用户角色
-    #         st.success(f"✅ Logged in as {role.capitalize()}!")
-    #         st.query_params.update({"page": role})  # **跳转到对应角色界面**
-    #     else:
-    #         st.error("❌ Invalid email or password")
-
 # **🔹 Admin 页面**
 elif page == "admin":
     st.markdown('<div class="main-title">⚙️ Admin Dashboard</div>', unsafe_allow_html=True)
@@ -137,8 +129,34 @@ elif page == "sales":
 elif page == "superadmin":
     st.markdown('<div class="main-title">🛠️ Super Admin Panel</div>', unsafe_allow_html=True)
     st.write("Welcome, Super Admin! You have full access to the system.")
+    page = st.radio("Choose an action", ["Super Admin Panel", "Add New User"])
+        
+    if page == "Super Admin Panel":
+        st.subheader("🛠️ Super Admin Panel")
+        st.write("Welcome to the Super Admin Panel.")
+        
+    elif page == "Add New User":
+        st.subheader("🛠️ Add New User")
+        new_email = st.text_input("User Email")
+        new_name = st.text_input("Full Name")
+        new_role = st.selectbox("Role", ["Admin", "Sales"])
+            
+        if st.button("Add User"):
+            if new_email and new_name:
+                activation_code = add_user(new_email, new_name, new_role)
+                activation_link = f"{ACTIVATION_URL}{activation_code}"
+                st.success(f"✅ {new_name} ({new_role}) added successfully!")
+                st.write(f"🔗 Activation Link: [Click here to activate]({activation_link})")
+                st.code(activation_link)  # 显示纯文本链接，方便复制
+            else:
+                st.error("❌ Please fill in all fields.")
+
     if st.button("Logout"):
-        st.query_params.update({"page": "login"})  # 退出回到登录页
+        st.session_state.logged_in = False
+        st.session_state.user_name = ""
+        st.session_state.user_role = ""
+        st.rerun()
+
 
 # **🔹 版权信息**
 st.markdown('<div class="footer">© 2025 Leasing Board - All rights reserved.</div>', unsafe_allow_html=True)
