@@ -216,9 +216,9 @@ elif page == "activate":
     st.title("🔓 Account Activation")
     
     # Show activation form
-    activation_code = st.text_input("Enter your activation code")
-    new_password = st.text_input("Enter new password", type="password")
-    confirm_password = st.text_input("Confirm new password", type="password")
+    activation_code = st.text_input("Enter your activation code", key="activation_code_input")
+    new_password = st.text_input("Enter new password", type="password", key="new_password_input")
+    confirm_password = st.text_input("Confirm new password", type="password", key="confirm_password_input")
     
     if activation_code:
         # Search for the user with the given activation code
