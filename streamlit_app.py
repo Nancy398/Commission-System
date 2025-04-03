@@ -102,13 +102,15 @@ question = st.empty()
 time.sleep(0.5)  # 模拟渐显效果
 question.markdown('<div class="question">What do you want to do today?</div>', unsafe_allow_html=True)
 
-# 使用 HTML + Markdown 创建自定义按钮
-st.markdown("""
-    <div class="btn-container">
-        <a href="?page=login" class="btn btn-login">Login</a>
-        <a href="?page=leasing_data" class="btn btn-leasing">Leasing Data</a>
-    </div>
-""", unsafe_allow_html=True)
+col1, col2 = st.columns(2)
+
+with col1:
+    if st.button("Login", key="login_btn", help="Go to Login Page", use_container_width=True):
+        st.switch_page("login.py")
+
+with col2:
+    if st.button("Leasing Data", key="leasing_btn", help="View Leasing Data", use_container_width=True):
+        st.switch_page("leasing_data.py")
 
 # 页面底部（版权或额外信息）
 st.markdown('<div class="footer">© 2025 Leasing Board - All rights reserved.</div>', unsafe_allow_html=True)
