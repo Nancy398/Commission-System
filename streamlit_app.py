@@ -152,10 +152,7 @@ elif page == "SuperAdmin":
                 st.error("❌ Please fill in all fields.")
 
     if st.button("Logout"):
-        st.session_state.logged_in = False
-        st.session_state.user_name = ""
-        st.session_state.user_role = ""
-        st.rerun()
+        st.query_params.update({"page": "login"})
 
 
 # **🔹 版权信息**
