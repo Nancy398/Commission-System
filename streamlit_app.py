@@ -170,7 +170,7 @@ elif page == "login":
                 st.error("❌ User not found.")
 
 # **🔹 Admin 页面**
-elif page == "admin":
+elif page == "Admin":
     st.markdown('<div class="main-title">⚙️ Admin Dashboard</div>', unsafe_allow_html=True)
     st.write("Welcome, Admin! Manage users and settings.")
     if st.button("Logout"):
