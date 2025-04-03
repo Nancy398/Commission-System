@@ -85,7 +85,7 @@ if activation_code:
                 if new_password and new_password == confirm_password:
                     update_user_password(user["Email"], new_password)  # 更新密码
                     st.success("✅ Account activated! You can now log in.")
-                    st.experimental_rerun()  # **强制刷新 Streamlit 页面**
+                    st.rerun()  # **强制刷新 Streamlit 页面**
                 else:
                     st.error("❌ Passwords do not match.")
             break
