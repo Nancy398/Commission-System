@@ -23,10 +23,6 @@ from google.oauth2.service_account import Credentials
 import streamlit as st
 import time
 
-import streamlit as st
-
-import streamlit as st
-
 SHEET_NAME = "UserDatabase"
 ACTIVATION_URL = "https://commission-system-moohousing.streamlit.app/?page=activate"  # 修改为你的 Streamlit 应用地址
 
