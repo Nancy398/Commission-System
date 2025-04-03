@@ -23,9 +23,6 @@ from google.oauth2.service_account import Credentials
 import streamlit as st
 import time
 
-import streamlit as st
-import time
-
 # 页面标题和样式
 st.markdown("""
     <style>
@@ -42,11 +39,16 @@ st.markdown("""
             font-size: 20px;
             margin-bottom: 30px;
         }
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
         .btn {
-            display: block;
-            width: 250px;
-            padding: 20px;
-            margin: 10px auto;
+            display: inline-block;
+            width: 200px;
+            padding: 15px;
             font-size: 20px;
             font-weight: bold;
             text-align: center;
@@ -55,6 +57,7 @@ st.markdown("""
             transition: all 0.4s ease;
             box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
             cursor: pointer;
+            text-decoration: none;
         }
         .btn-login {
             background-color: #3498db;  /* 蓝色 */
@@ -67,13 +70,6 @@ st.markdown("""
         .btn:hover {
             transform: scale(1.1);
             box-shadow: 0px 15px 35px rgba(0, 0, 0, 0.25);
-        }
-        .centered {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 70vh;
-            flex-direction: column;
         }
         .footer {
             text-align: center;
@@ -100,30 +96,21 @@ st.markdown("""
 st.markdown('<div class="main-title">Welcome to Leasing Board!</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-title">Manage your leasing data easily and securely</div>', unsafe_allow_html=True)
 
-# 问题提示
-question = st.empty()  # 用来逐步显示问题
+# 逐步显示问题文本
+question = st.empty()
+time.sleep(0.5)  # 模拟渐显效果
 question.markdown('<div class="question">What do you want to do today?</div>', unsafe_allow_html=True)
 
-# 使用 columns 来并排显示按钮
-col1, col2 = st.columns(2)
-
-# 动态显示按钮
-with col1:
-    time.sleep(1)
-    if st.button("Login", key="login_button", help="Login to your account", on_click=None, args=None, disabled=False, 
-                 css="btn btn-login"):
-        st.experimental_set_query_params(page="login")  # 跳转到登录页面
-
-with col2:
-    time.sleep(1)
-    if st.button("Leasing Data", key="leasing_data_button", help="Access leasing data", on_click=None, args=None, disabled=False, 
-                 css="btn btn-leasing"):
-        st.experimental_set_query_params(page="leasing_data")  # 跳转到Leasing Data 页面
+# 使用 HTML + Markdown 创建自定义按钮
+st.markdown("""
+    <div class="btn-container">
+        <a href="?page=login" class="btn btn-login">Login</a>
+        <a href="?page=leasing_data" class="btn btn-leasing">Leasing Data</a>
+    </div>
+""", unsafe_allow_html=True)
 
 # 页面底部（版权或额外信息）
 st.markdown('<div class="footer">© 2025 Leasing Board - All rights reserved.</div>', unsafe_allow_html=True)
-
-
 
 
 
