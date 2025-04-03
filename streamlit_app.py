@@ -41,23 +41,28 @@ st.markdown("""
         }
         .btn {
             display: block;
-            width: 250px;
-            padding: 15px;
-            margin: 20px auto;
-            font-size: 18px;
+            width: 200px;
+            padding: 20px;
+            margin: 10px;
+            font-size: 20px;
             font-weight: bold;
             text-align: center;
-            background: linear-gradient(45deg, #2980b9, #3498db);
-            color: white;
             border-radius: 12px;
-            box-shadow: 0px 8px 15px rgba(41, 128, 185, 0.3);
             border: none;
             transition: all 0.3s ease;
+            box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        .btn-login {
+            background: linear-gradient(45deg, #2980b9, #3498db);
+            color: white;
+        }
+        .btn-leasing {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
         }
         .btn:hover {
-            background: linear-gradient(45deg, #3498db, #2980b9);
-            box-shadow: 0px 15px 25px rgba(41, 128, 185, 0.4);
             cursor: pointer;
+            box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.1);
         }
         .centered {
             display: flex;
@@ -95,18 +100,23 @@ st.markdown('<div class="sub-title">Manage your leasing data easily and securely
 question = st.empty()  # 用来逐步显示问题
 question.markdown('<div class="question">What do you want to do today?</div>', unsafe_allow_html=True)
 
+# 使用 columns 来并排显示按钮
+col1, col2 = st.columns(2)
+
 # 动态显示按钮
-with st.container():
+with col1:
     time.sleep(1)
-    if st.button("Login", key="login_button", help="Login to your account"):
+    if st.button("Login", key="login_button", help="Login to your account", on_click=None, args=None, disabled=False):
         st.experimental_set_query_params(page="login")  # 跳转到登录页面
 
+with col2:
     time.sleep(1)
-    if st.button("Leasing Data", key="leasing_data_button", help="Access leasing data"):
+    if st.button("Leasing Data", key="leasing_data_button", help="Access leasing data", on_click=None, args=None, disabled=False):
         st.experimental_set_query_params(page="leasing_data")  # 跳转到Leasing Data 页面
 
 # 页面底部（版权或额外信息）
 st.markdown('<div class="footer">© 2025 Leasing Board - All rights reserved.</div>', unsafe_allow_html=True)
+
 
 
 # SHEET_NAME = "UserDatabase"
