@@ -12,17 +12,6 @@ import time
 import bcrypt
 import uuid
 
-import streamlit as st
-import gspread
-from google.oauth2.service_account import Credentials
-
-import streamlit as st
-import gspread
-from google.oauth2.service_account import Credentials
-
-import streamlit as st
-import time
-
 SHEET_NAME = "UserDatabase"
 ACTIVATION_URL = "https://commission-system-moohousing.streamlit.app/?page=activate"  # 修改为你的 Streamlit 应用地址
 
@@ -71,6 +60,7 @@ page = query_params.get("page", ["home"])  # 默认显示登录页面
 
 # **🔹 主界面**
 if page == "home":
+    st.write(page)
     st.markdown('<div class="main-title">Welcome to Leasing Board!</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-title">Manage your leasing data easily and securely</div>', unsafe_allow_html=True)
     
