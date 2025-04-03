@@ -66,7 +66,8 @@ st.title("🔑 User Login")
 
 # ---- 处理激活链接 ----
 activation_params = st.query_params
-activation_code = activation_params.get("activate", [None])[0]  # 取 "activate" 参数
+# activation_code = activation_params.get("activate", [None])[0]
+activation_code = activation_params.get("activate"）
 st.write(activation_code)
 st.write(activation_params)
 # 如果 URL 里有 activation_code，则显示激活界面
