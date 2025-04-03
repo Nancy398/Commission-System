@@ -105,7 +105,7 @@ question.markdown('<div class="question">What do you want to do today?</div>', u
 page = st.radio("Select an option", ("Login", "Leasing Data"))
 
 if page == "Login":
-    st.switch_page("login.py")  # 直接跳转到 login 页面
+    st.switch_page("login")  # 直接跳转到 login 页面
 
 elif page == "Leasing Data":
     st.switch_page("leasing_data")  # 直接跳转到 Leasing Data 页面
