@@ -58,6 +58,7 @@ st.markdown("""
             box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
             cursor: pointer;
             text-decoration: none;
+            color: white !important;
         }
         .btn-login {
             background-color: #A7C7E7;  /* 蓝色 */
