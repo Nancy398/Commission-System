@@ -94,7 +94,7 @@ if not st.session_state.logged_in:
     email = st.text_input("Email", key="email_input")
     password = st.text_input("Password", type="password", key="password_input")
 
-    if st.button("Add User"):
+if st.button("Add User"):
     if new_email and new_name:
         activation_code = add_user(new_email, new_name, new_role, "temp_password")
         st.success(f"✅ {new_name} ({new_role}) added successfully!")
