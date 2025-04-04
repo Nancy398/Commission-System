@@ -206,35 +206,23 @@ elif page == "Sales":
         st.dataframe(filtered_data)
     else:
         st.write("No completed deals found for this sales representative.")
-    filtered_data = filtered_data.copy()  # 避免直接修改原始数据
 
-# 添加 Select 列到 session_state 中（只初始化一次）
-    # 初始化状态
-    if 'selected_rows' not in st.session_state or len(st.session_state.selected_rows) != len(filtered_data):
-        st.session_state.selected_rows = [False] * len(filtered_data)
+    edited_data = st.data_editor(
+    filtered_data,
+    column_config={
+        "Select": st.column_config.CheckboxColumn("Select", default=False)
+    },
+    use_container_width=True,
+    hide_index=True,
+    num_rows="dynamic"
+    )
     
-    # 全选功能
-    select_all = st.checkbox("✅ Select All", value=all(st.session_state.selected_rows))
+    # 计算总佣金
+    selected_rows = edited_data[edited_data["Select"] == True]
+    total_commission = selected_rows["Commission"].sum()
     
-    # 更新所有勾选状态
-    if select_all:
-        st.session_state.selected_rows = [True] * len(filtered_data)
-    else:
-        st.session_state.selected_rows = [
-            st.checkbox(f"Select row {i+1}", value=st.session_state.selected_rows[i], key=f"row_{i}")
-            for i in range(len(filtered_data))
-        ]
-    
-    # 把勾选状态加到表格里
-    filtered_data['Selected'] = st.session_state.selected_rows
-    
-    # 显示表格
-    st.dataframe(filtered_data, use_container_width=True)
-    
-    # 计算被选中行的总佣金
-    selected_commission = filtered_data[filtered_data['Selected'] == True]['Commission'].sum()
-    
-    st.markdown(f"### 💰 Total Selected Commission: **${selected_commission:,.2f}**")
+    st.markdown(f"### 💰 Total Selected Commission: **${total_commission:,.2f}**")
+       
 
 
     # 退出按钮
