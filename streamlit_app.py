@@ -213,8 +213,6 @@ elif page == "Sales":
     # 欢迎语 + 用户名
     st.success(f"Welcome, {user_name}! View and manage your leasing data below.")
     
-    sales = st.session_state.user_name  # Get the current sales rep
-    
     st.write(f"Displaying completed deals for: {user_name}")
     
     # Display sales data for the logged-in sales rep
