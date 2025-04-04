@@ -212,6 +212,7 @@ elif page == "Sales":
         hide_index=True,
         num_rows="dynamic"
         )
+        st.dataframe(edited_data)
     else:
         st.write("No completed deals found for this sales representative.")
 
