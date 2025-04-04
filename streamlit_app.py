@@ -71,7 +71,7 @@ def display_sales_data(agent_name):
     data = get_leasing_data("Leasing Database")
     
     # Filter the data by the sales rep
-    filtered_data = filter_sales_data(sales_rep, data)
+    filtered_data = filter_sales_data(agent_name, data)
     
     # Display the filtered data in a table
     if filtered_data:
