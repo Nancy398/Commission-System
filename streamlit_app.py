@@ -202,6 +202,7 @@ elif page == "Sales":
     # Display sales data for the logged-in sales rep
     data = get_leasing_data("Leasing Database")
     filtered_data = filter_sales_data(user_name, data)
+    filtered_data = pd.dataframe(filtered_data)
     if filtered_data:
         edited_data = st.data_editor(
         filtered_data,
