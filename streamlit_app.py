@@ -65,23 +65,7 @@ def filter_sales_data(agent_name, data):
     # Filter the data for the specific sales rep
     filtered_data = [row for row in data if row['Agent'] == agent_name]
     return filtered_data
-
-def display_sales_data(agent_name):
-    # Get the Leasing data from the sheet
-    data = get_leasing_data("Leasing Database")
-    st.dataframe(data)
     
-    # Filter the data by the sales rep
-    filtered_data = filter_sales_data(agent_name, data)
-    
-    # Display the filtered data in a table
-    if filtered_data:
-        st.dataframe(filtered_data)
-    else:
-        st.write("No completed deals found for this sales representative.")
-        
-
-
 # 获取 URL 参数
 query_params = st.query_params
 page = query_params.get("page",'home')# 默认显示登录页面
@@ -217,7 +201,41 @@ elif page == "Sales":
     st.write(f"Displaying completed deals for: {user_name}")
     
     # Display sales data for the logged-in sales rep
-    display_sales_data(user_name)
+    data = get_leasing_data("Leasing Database")
+    filtered_data = filter_sales_data(agent_name, data)
+    if filtered_data:
+        st.dataframe(filtered_data)
+        if 'selected_rows' not in st.session_state:
+            st.session_state.selected_rows = [False] * len(filtered_data)
+    
+    # 全选开关
+    select_all = st.checkbox("Select All")
+    
+    # 如果点击全选按钮，更新所有行的勾选状态
+    if select_all:
+        st.session_state.selected_rows = [True] * len(filtered_data)
+    elif not any(st.session_state.selected_rows):
+        st.session_state.selected_rows = [False] * len(filtered_data)
+    
+    # 显示带勾选框的每一行
+    st.write("### Select Commissions")
+    selected_commissions = 0
+    
+    for i, row in df.iterrows():
+        st.session_state.selected_rows[i] = st.checkbox(
+            f"{row['Agent']} - ${row['Commission']}",
+            value=st.session_state.selected_rows[i],
+            key=f"checkbox_{i}"
+        )
+        if st.session_state.selected_rows[i]:
+            selected_commissions += row['Commission']
+
+# 显示总佣金
+st.markdown(f"### 💰 Total Selected Commission: ${selected_commissions}")
+
+    
+    else:
+        st.write("No completed deals found for this sales representative.")
 
     # 退出按钮
     if st.button("Logout"):
