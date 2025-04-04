@@ -53,6 +53,32 @@ def update_user_password(email, new_password):
             return True
     return False
 
+def get_leasing_data(sheet_name):
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    credentials = Credentials.from_service_account_info(st.secrets["GOOGLE_APPLICATION_CREDENTIALS"], scopes=scope)
+    gc = gspread.authorize(credentials)
+    sheet = gc.open(sheet_name).sheet2
+    data = sheet.get_all_records()
+    return data
+
+def filter_sales_data(agent_name, data):
+    # Filter the data for the specific sales rep
+    filtered_data = [row for row in data if row['Agent'] == agent_name
+    return filtered_data
+
+def display_sales_data(agent_name):
+    # Get the Leasing data from the sheet
+    data = get_leasing_data("Leasing Database")
+    
+    # Filter the data by the sales rep
+    filtered_data = filter_sales_data(sales_rep, data)
+    
+    # Display the filtered data in a table
+    if filtered_data:
+        st.dataframe(filtered_data)
+    else:
+        st.write("No completed deals found for this sales representative.")
+
 # 获取 URL 参数
 query_params = st.query_params
 page = query_params.get("page",'home')# 默认显示登录页面
@@ -179,9 +205,29 @@ elif page == "Admin":
 # **🔹 Sales 页面**
 elif page == "Sales":
     st.markdown('<div class="main-title">📈 Sales Dashboard</div>', unsafe_allow_html=True)
-    st.write("Welcome, Sales team! View and manage sales data.")
+    
+    # 欢迎语 + 用户名
+    st.success(f"Welcome, {st.session_state.get('user_name', 'Sales')}! View and manage your leasing data below.")
+    
+    # 读取 Google Sheet 数据
+    leasing_data = load_leasing_data()  # 自定义函数
+    user_email = st.session_state.get("user_email", "")
+    
+    if user_email:
+        # 只显示当前 Sales 对应的数据
+        filtered_data = leasing_data[leasing_data["Sales Email"] == user_email]
+        st.dataframe(filtered_data)
+    else:
+        st.warning("⚠️ Please log in first.")
+
+    # 退出按钮
     if st.button("Logout"):
-        st.query_params.update({"page": "login"})  # 退出回到登录页
+        st.session_state.logged_in = False
+        st.session_state.user_name = ""
+        st.session_state.user_role = ""
+        st.session_state.user_email = ""
+        st.query_params.update({"page": "login"})
+        st.rerun()
 
 # **🔹 Super Admin 页面**
 elif page == "SuperAdmin":
