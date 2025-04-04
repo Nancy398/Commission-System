@@ -62,7 +62,6 @@ def get_leasing_data(sheet_name):
     return data
 
 def filter_sales_data(agent_name, data):
-    # Filter the data for the specific sales rep
     filtered_data = [row for row in data if row['Agent'] == agent_name]
     return filtered_data
     
@@ -202,7 +201,7 @@ elif page == "Sales":
     
     # Display sales data for the logged-in sales rep
     data = get_leasing_data("Leasing Database")
-    filtered_data = filter_sales_data(agent_name, data)
+    filtered_data = filter_sales_data(user_name, data)
     if filtered_data:
         st.dataframe(filtered_data)
         if 'selected_rows' not in st.session_state:
