@@ -203,21 +203,19 @@ elif page == "Sales":
     data = get_leasing_data("Leasing Database")
     filtered_data = filter_sales_data(user_name, data)
     if filtered_data:
-        st.dataframe(filtered_data)
+        edited_data = st.data_editor(
+        filtered_data,
+        column_config={
+            "Select": st.column_config.CheckboxColumn("Select", default=False)
+        },
+        use_container_width=True,
+        hide_index=True,
+        num_rows="dynamic"
+        )
     else:
         st.write("No completed deals found for this sales representative.")
 
-    edited_data = st.data_editor(
-    filtered_data,
-    column_config={
-        "Select": st.column_config.CheckboxColumn("Select", default=False)
-    },
-    use_container_width=True,
-    hide_index=True,
-    num_rows="dynamic"
-    )
-    
-    # 计算总佣金
+   
     selected_rows = edited_data[edited_data["Select"] == True]
     total_commission = selected_rows["Commission"].sum()
     
