@@ -84,6 +84,7 @@ def display_sales_data(agent_name):
 # 获取 URL 参数
 query_params = st.query_params
 page = query_params.get("page",'home')# 默认显示登录页面
+user_name = query_params.get("user_name", "Unknown")
 
 
 # **🔹 主界面**
@@ -190,7 +191,8 @@ elif page == "login":
                     st.session_state.user_name = user["Name"]
                     st.session_state.user_role = user["Role"]
                     st.success(f"✅ Welcome, {user['Name']}!")
-                    st.query_params.update({"page": st.session_state.user_role})
+                    st.query_params.update({"page": st.session_state.user_role,
+                                           "user_name": st.session_state.user_name})
                     st.rerun()
                 else:
                     st.error("❌ Invalid password.")
@@ -209,14 +211,14 @@ elif page == "Sales":
     st.markdown('<div class="main-title">📈 Sales Dashboard</div>', unsafe_allow_html=True)
     
     # 欢迎语 + 用户名
-    st.success(f"Welcome, {st.session_state.get('user_name', 'Sales')}! View and manage your leasing data below.")
+    st.success(f"Welcome, {user_name}! View and manage your leasing data below.")
     
     sales = st.session_state.user_name  # Get the current sales rep
     
-    st.write(f"Displaying completed deals for: {sales}")
+    st.write(f"Displaying completed deals for: {user_name}")
     
     # Display sales data for the logged-in sales rep
-    display_sales_data(sales)
+    display_sales_data(user_name)
 
     # 退出按钮
     if st.button("Logout"):
