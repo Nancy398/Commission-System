@@ -69,7 +69,7 @@ def filter_sales_data(agent_name, data):
 def display_sales_data(agent_name):
     # Get the Leasing data from the sheet
     data = get_leasing_data("Leasing Database")
-   st.dataframe(data)
+    st.dataframe(data)
     
     # Filter the data by the sales rep
     filtered_data = filter_sales_data(agent_name, data)
