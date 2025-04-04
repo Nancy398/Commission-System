@@ -189,7 +189,7 @@ elif page == "login":
                     st.session_state.user_role = user["Role"]
                     st.success(f"✅ Welcome, {user['Name']}!")
                     st.query_params.update({"page": st.session_state.user_role})
-                    st.rerun()
+                    # st.rerun()
                 else:
                     st.error("❌ Invalid password.")
             else:
