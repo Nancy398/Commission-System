@@ -209,35 +209,32 @@ elif page == "Sales":
     filtered_data = filtered_data.copy()  # 避免直接修改原始数据
 
 # 添加 Select 列到 session_state 中（只初始化一次）
-    if 'df_with_checkbox' not in st.session_state:
-        filtered_data['Select'] = False
-        st.session_state.df_with_checkbox = filtered_data
+    # 初始化状态
+    if 'selected_rows' not in st.session_state or len(st.session_state.selected_rows) != len(filtered_data):
+        st.session_state.selected_rows = [False] * len(filtered_data)
+    
+    # 全选功能
+    select_all = st.checkbox("✅ Select All", value=all(st.session_state.selected_rows))
+    
+    # 更新所有勾选状态
+    if select_all:
+        st.session_state.selected_rows = [True] * len(filtered_data)
     else:
-        # 如果数据行数发生变化（比如重新登录），同步更新
-        if len(st.session_state.df_with_checkbox) != len(filtered_data):
-            filtered_data['Select'] = False
-            st.session_state.df_with_checkbox = filtered_data
+        st.session_state.selected_rows = [
+            st.checkbox(f"Select row {i+1}", value=st.session_state.selected_rows[i], key=f"row_{i}")
+            for i in range(len(filtered_data))
+        ]
     
-    # 显示全选复选框
-    select_all = st.checkbox("✅ Select All")
+    # 把勾选状态加到表格里
+    filtered_data['Selected'] = st.session_state.selected_rows
     
-    # 根据全选更新 Select 列
-    st.session_state.df_with_checkbox['Select'] = select_all
+    # 显示表格
+    st.dataframe(filtered_data, use_container_width=True)
     
-    # 使用 data_editor 显示表格
-    edited_df = st.data_editor(
-        st.session_state.df_with_checkbox,
-        use_container_width=True,
-        disabled=[col for col in filtered_data.columns if col != "Select"],
-        key="editor"
-    )
+    # 计算被选中行的总佣金
+    selected_commission = filtered_data[filtered_data['Selected'] == True]['Commission'].sum()
     
-    # 统计已选中的行的总佣金
-    selected_df = edited_df[edited_df["Select"] == True]
-    total_commission = selected_df["Commission"].sum()
-    
-    # 显示佣金总计
-    st.markdown(f"### 💰 Total Selected Commission: **${total_commission:,.2f}**")
+    st.markdown(f"### 💰 Total Selected Commission: **${selected_commission:,.2f}**")
 
 
     # 退出按钮
