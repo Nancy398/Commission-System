@@ -78,6 +78,8 @@ def display_sales_data(agent_name):
         st.dataframe(filtered_data)
     else:
         st.write("No completed deals found for this sales representative.")
+        
+
 
 # 获取 URL 参数
 query_params = st.query_params
@@ -209,16 +211,12 @@ elif page == "Sales":
     # 欢迎语 + 用户名
     st.success(f"Welcome, {st.session_state.get('user_name', 'Sales')}! View and manage your leasing data below.")
     
-    # 读取 Google Sheet 数据
-    leasing_data = load_leasing_data()  # 自定义函数
-    user_email = st.session_state.get("user_email", "")
+    sales = st.session_state.user_name  # Get the current sales rep
     
-    if user_email:
-        # 只显示当前 Sales 对应的数据
-        filtered_data = leasing_data[leasing_data["Sales Email"] == user_email]
-        st.dataframe(filtered_data)
-    else:
-        st.warning("⚠️ Please log in first.")
+    st.write(f"Displaying completed deals for: {sales}")
+    
+    # Display sales data for the logged-in sales rep
+    display_sales_data(sales)
 
     # 退出按钮
     if st.button("Logout"):
