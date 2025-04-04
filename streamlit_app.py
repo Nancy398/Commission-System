@@ -209,29 +209,29 @@ elif page == "Sales":
             st.session_state.selected_rows = [False] * len(filtered_data)
     
     # 全选开关
-    select_all = st.checkbox("Select All")
+        select_all = st.checkbox("Select All")
+        
+        # 如果点击全选按钮，更新所有行的勾选状态
+        if select_all:
+            st.session_state.selected_rows = [True] * len(filtered_data)
+        elif not any(st.session_state.selected_rows):
+            st.session_state.selected_rows = [False] * len(filtered_data)
+        
+        # 显示带勾选框的每一行
+        st.write("### Select Commissions")
+        selected_commissions = 0
+        
+        for i, row in df.iterrows():
+            st.session_state.selected_rows[i] = st.checkbox(
+                f"{row['Agent']} - ${row['Commission']}",
+                value=st.session_state.selected_rows[i],
+                key=f"checkbox_{i}"
+            )
+            if st.session_state.selected_rows[i]:
+                selected_commissions += row['Commission']
     
-    # 如果点击全选按钮，更新所有行的勾选状态
-    if select_all:
-        st.session_state.selected_rows = [True] * len(filtered_data)
-    elif not any(st.session_state.selected_rows):
-        st.session_state.selected_rows = [False] * len(filtered_data)
-    
-    # 显示带勾选框的每一行
-    st.write("### Select Commissions")
-    selected_commissions = 0
-    
-    for i, row in df.iterrows():
-        st.session_state.selected_rows[i] = st.checkbox(
-            f"{row['Agent']} - ${row['Commission']}",
-            value=st.session_state.selected_rows[i],
-            key=f"checkbox_{i}"
-        )
-        if st.session_state.selected_rows[i]:
-            selected_commissions += row['Commission']
-
-# 显示总佣金
-st.markdown(f"### 💰 Total Selected Commission: ${selected_commissions}")
+    # 显示总佣金
+        st.markdown(f"### 💰 Total Selected Commission: ${selected_commissions}")
 
     
     else:
