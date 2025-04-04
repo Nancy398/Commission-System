@@ -57,7 +57,7 @@ def get_leasing_data(sheet_name):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     credentials = Credentials.from_service_account_info(st.secrets["GOOGLE_APPLICATION_CREDENTIALS"], scopes=scope)
     gc = gspread.authorize(credentials)
-    sheet = gc.open(sheet_name).sheet2
+    sheet = gc.open(sheet_name).worksheet("Sheet2")
     data = sheet.get_all_records()
     return data
 
