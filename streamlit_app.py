@@ -63,7 +63,7 @@ def get_leasing_data(sheet_name):
 
 def filter_sales_data(agent_name, data):
     # Filter the data for the specific sales rep
-    filtered_data = [row for row in data if row['Agent'] == agent_name
+    filtered_data = [row for row in data if row['Agent'] == agent_name]
     return filtered_data
 
 def display_sales_data(agent_name):
